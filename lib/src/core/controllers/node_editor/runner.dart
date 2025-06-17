@@ -110,13 +110,11 @@ class FlNodeEditorRunner {
     _dataDeps[nodeId] = _getConnectedNodeIdsFromNode(
       _nodes[nodeId]!,
       PortDirection.input,
-      PortType.data,
     );
 
     final connectedOutputNodeIds = _getConnectedNodeIdsFromNode(
       _nodes[nodeId]!,
       PortDirection.output,
-      PortType.control,
     );
 
     for (final connectedNodeId in connectedOutputNodeIds) {
@@ -143,13 +141,11 @@ class FlNodeEditorRunner {
   Set<String> _getConnectedNodeIdsFromNode(
     NodeInstance node,
     PortDirection direction,
-    PortType type,
   ) {
     final connectedNodeIds = <String>{};
 
     final ports = node.ports.values.where(
-      (port) =>
-          port.prototype.direction == direction && port.prototype.type == type,
+      (port) => port.prototype.direction == direction,
     );
 
     for (final port in ports) {
@@ -196,10 +192,6 @@ class FlNodeEditorRunner {
           port,
         );
 
-        if (port.prototype.type != PortType.control) {
-          throw Exception('Port ${port.prototype.idName} is not of type event');
-        }
-
         for (final nodeId in connectedNodeIds) {
           futures.add(_executeNode(_nodes[nodeId]!));
         }
@@ -217,10 +209,6 @@ class FlNodeEditorRunner {
 
         final port = node.ports[idName]!;
         port.data = data;
-
-        if (port.prototype.type != PortType.data) {
-          throw Exception('Port ${port.prototype.idName} is not of type data');
-        }
 
         for (final link in port.links) {
           final connectedNode = _nodes[link.fromTo.fromPort]!;

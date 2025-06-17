@@ -441,12 +441,6 @@ class FlNodeEditorController {
         SnackbarType.error,
       );
       return null;
-    } else if (port1.prototype.type != port2.prototype.type) {
-      showNodeEditorSnackbar(
-        'Cannot connect ports of different types: ${port1.prototype.type} and ${port2.prototype.type}',
-        SnackbarType.error,
-      );
-      return null;
     } else if (port1.prototype.direction == port2.prototype.direction) {
       showNodeEditorSnackbar(
         'Cannot connect two ports with the same direction: ${port1.prototype.displayName} and ${port2.prototype.displayName}',
@@ -499,7 +493,7 @@ class FlNodeEditorController {
       }
 
       // Check if the input port already has a link
-      if (toPort.prototype.type == PortType.data && toPort.links.isNotEmpty) {
+      if (toPort.links.isNotEmpty) {
         showNodeEditorSnackbar(
           'Cannot connect multiple links to an data input port: ${toPort.prototype.displayName} in node ${toNode.prototype.displayName}',
           SnackbarType.error,

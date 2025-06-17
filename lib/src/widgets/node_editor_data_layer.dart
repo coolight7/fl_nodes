@@ -528,7 +528,6 @@ class _NodeEditorDataLayerState extends State<NodeEditorDataLayer>
             if (value.ports.any(
               (port) =>
                   port.direction != startPort.prototype.direction &&
-                  port.type == startPort.prototype.type &&
                   (port.dataType == startPort.prototype.dataType ||
                       port.dataType == dynamic ||
                       startPort.prototype.dataType == dynamic),
@@ -574,8 +573,6 @@ class _NodeEditorDataLayerState extends State<NodeEditorDataLayer>
                       (port) =>
                           port.value.prototype.direction !=
                               startPort.prototype.direction &&
-                          port.value.prototype.type ==
-                              startPort.prototype.type &&
                           (port.value.prototype.dataType ==
                                   startPort.prototype.dataType ||
                               port.value.prototype.dataType == dynamic ||

@@ -104,8 +104,6 @@ class TempLink {
 
 enum PortDirection { input, output }
 
-enum PortType { data, control }
-
 /// A port prototype is the blueprint for a port instance.
 ///
 /// It defines the name, data type, direction, and if it allows multiple links.
@@ -115,7 +113,6 @@ abstract class PortPrototype {
   final FlPortStyleBuilder styleBuilder;
   final Type dataType;
   final PortDirection direction;
-  final PortType type;
 
   PortPrototype({
     required this.idName,
@@ -123,7 +120,6 @@ abstract class PortPrototype {
     this.styleBuilder = defaultPortStyle,
     this.dataType = dynamic,
     required this.direction,
-    required this.type,
   });
 }
 
@@ -133,7 +129,7 @@ class DataInputPortPrototype extends PortPrototype {
     required super.displayName,
     super.styleBuilder,
     super.dataType,
-  }) : super(direction: PortDirection.input, type: PortType.data);
+  }) : super(direction: PortDirection.input);
 }
 
 class DataOutputPortPrototype extends PortPrototype {
@@ -142,23 +138,7 @@ class DataOutputPortPrototype extends PortPrototype {
     required super.displayName,
     super.styleBuilder,
     super.dataType,
-  }) : super(direction: PortDirection.output, type: PortType.data);
-}
-
-class ControlInputPortPrototype extends PortPrototype {
-  ControlInputPortPrototype({
-    required super.idName,
-    required super.displayName,
-    super.styleBuilder,
-  }) : super(direction: PortDirection.input, type: PortType.control);
-}
-
-class ControlOutputPortPrototype extends PortPrototype {
-  ControlOutputPortPrototype({
-    required super.idName,
-    required super.displayName,
-    super.styleBuilder,
-  }) : super(direction: PortDirection.output, type: PortType.control);
+  }) : super(direction: PortDirection.output);
 }
 
 /// The state of a port painted on the canvas.
