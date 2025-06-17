@@ -237,7 +237,7 @@ class FlNodeEditorRunner {
     } catch (e) {
       controller.focusNodesById({node.id});
       showNodeEditorSnackbar(
-        'Error executing node: ${node.prototype.displayName}: $e',
+        '运行结果异常: ${node.prototype.displayName}: $e',
         SnackbarType.error,
       );
       return;

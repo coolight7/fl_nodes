@@ -85,7 +85,7 @@ class FlNodeEditorClipboard {
       base64Data = base64Encode(utf8.encode(jsonData));
     } catch (e) {
       showNodeEditorSnackbar(
-        'Failed to copy nodes. Invalid clipboard data. ($e)',
+        '复制失败，编码错误. ($e)',
         SnackbarType.error,
       );
       return '';
@@ -94,7 +94,7 @@ class FlNodeEditorClipboard {
     await Clipboard.setData(ClipboardData(text: base64Data));
 
     showNodeEditorSnackbar(
-      'Nodes copied to clipboard.',
+      '已复制节点到剪切板',
       SnackbarType.success,
     );
 
@@ -133,7 +133,7 @@ class FlNodeEditorClipboard {
       );
     } catch (e) {
       showNodeEditorSnackbar(
-        'Failed to paste nodes. Invalid clipboard data. ($e)',
+        '粘贴失败，解码错误. ($e)',
         SnackbarType.error,
       );
       return;

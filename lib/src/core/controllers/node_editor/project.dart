@@ -201,7 +201,7 @@ class FlNodeEditorProject {
       jsonData = _toJson();
     } catch (e) {
       showNodeEditorSnackbar(
-        'Failed to save project.  Unable to serialize project data.',
+        '保存失败. 编码时出现错误.',
         SnackbarType.error,
       );
       return;
@@ -217,7 +217,7 @@ class FlNodeEditorProject {
     controller.eventBus.emit(SaveProjectEvent(id: const Uuid().v4()));
 
     showNodeEditorSnackbar(
-      'Project saved successfully.',
+      '工作流已保存',
       SnackbarType.success,
     );
   }
@@ -238,7 +238,7 @@ class FlNodeEditorProject {
 
     if (jsonData == null) {
       showNodeEditorSnackbar(
-        'Failed to load project. Invalid project data.',
+        '加载工作流失败，无法加载数据',
         SnackbarType.error,
       );
       return;
@@ -250,7 +250,7 @@ class FlNodeEditorProject {
       _fromJson(jsonData);
     } catch (e) {
       showNodeEditorSnackbar(
-        'Failed to load project. Unable to deserialize project data.',
+        '加载工作流失败，解码错误',
         SnackbarType.error,
       );
       return;
@@ -259,7 +259,7 @@ class FlNodeEditorProject {
     controller.eventBus.emit(LoadProjectEvent(id: const Uuid().v4()));
 
     showNodeEditorSnackbar(
-      'Project loaded successfully.',
+      '已加载新工作流',
       SnackbarType.success,
     );
   }
@@ -277,7 +277,7 @@ class FlNodeEditorProject {
     controller.eventBus.emit(NewProjectEvent(id: const Uuid().v4()));
 
     showNodeEditorSnackbar(
-      'New project created successfully.',
+      '已创建新工作流',
       SnackbarType.success,
     );
   }
