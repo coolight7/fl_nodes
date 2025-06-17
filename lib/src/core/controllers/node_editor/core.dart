@@ -437,13 +437,13 @@ class FlNodeEditorController {
       port2.prototype.dataType,
     )) {
       showNodeEditorSnackbar(
-        'Cannot connect ports of different data types: ${port1.prototype.dataType} and ${port2.prototype.dataType}',
+        '不能连接两个不同类型的点: ${port1.prototype.dataType} 和 ${port2.prototype.dataType}',
         SnackbarType.error,
       );
       return null;
     } else if (port1.prototype.direction == port2.prototype.direction) {
       showNodeEditorSnackbar(
-        'Cannot connect two ports with the same direction: ${port1.prototype.displayName} and ${port2.prototype.displayName}',
+        '不能连接两个相同输入输出方向的点: ${port1.prototype.displayName} 和 ${port2.prototype.displayName}',
         SnackbarType.error,
       );
       return null;
@@ -486,7 +486,7 @@ class FlNodeEditorController {
       // Check if the ports are compatible
       if (fromPort.prototype.direction == toPort.prototype.direction) {
         showNodeEditorSnackbar(
-          'Cannot connect two ports of the same type: ${fromPort.prototype.displayName} and ${toPort.prototype.displayName}',
+          '不能连接两个不同类型的点: ${fromPort.prototype.displayName} 和 ${toPort.prototype.displayName}',
           SnackbarType.error,
         );
         return false;
@@ -495,7 +495,7 @@ class FlNodeEditorController {
       // Check if the input port already has a link
       if (toPort.links.isNotEmpty) {
         showNodeEditorSnackbar(
-          'Cannot connect multiple links to an data input port: ${toPort.prototype.displayName} in node ${toNode.prototype.displayName}',
+          '输入点不能接受多个连接: ${toPort.prototype.displayName} ${toNode.prototype.displayName}',
           SnackbarType.error,
         );
         return false;

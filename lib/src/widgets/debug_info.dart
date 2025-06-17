@@ -43,14 +43,14 @@ class _DebugInfoWidgetState extends State<DebugInfoWidget> {
         children: [
           Text(
             'X: ${viewportOffset.dx.toStringAsFixed(2)}, Y: ${viewportOffset.dy.toStringAsFixed(2)}',
-            style: const TextStyle(color: Colors.red, fontSize: 16),
+            style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
           Text(
-            'Zoom: ${viewportZoom.toStringAsFixed(2)}',
-            style: const TextStyle(color: Colors.green, fontSize: 16),
+            '缩放: ${viewportZoom.toStringAsFixed(2)}',
+            style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
           Text(
-            'Selection count: $selectionCount',
+            '已选中: $selectionCount',
             style: const TextStyle(color: Colors.blue, fontSize: 16),
           ),
         ],

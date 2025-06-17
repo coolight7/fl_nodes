@@ -19,6 +19,7 @@ import '../core/models/events.dart';
 import '../core/models/styles.dart';
 
 import 'builders.dart';
+import 'data.dart';
 
 typedef _TempLink = ({String nodeId, String portId});
 
@@ -266,7 +267,8 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
                 Flexible(
                   child: Text(
                     field.prototype.displayName,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: FlData_c.fieldTextStyle ??
+                        const TextStyle(color: Colors.white70, fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -319,7 +321,8 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
         Flexible(
           child: Text(
             port.prototype.displayName,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: FlData_c.portTextStyle ??
+                const TextStyle(color: Colors.white70, fontSize: 13),
             overflow: TextOverflow.ellipsis,
             textAlign: isInput ? TextAlign.left : TextAlign.right,
           ),
