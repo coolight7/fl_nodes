@@ -369,9 +369,7 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
               onTap: () => overlayEntry?.remove(),
               child: Container(color: const Color.fromRGBO(0, 0, 0, 0.2)),
             ),
-            Positioned(
-              left: details.globalPosition.dx,
-              top: details.globalPosition.dy,
+            Center(
               child: Material(
                 color: const Color.fromRGBO(102, 204, 255, 0.2),
                 borderRadius: BorderRadius.circular(10),
