@@ -601,9 +601,8 @@ class _NodeEditorDataLayerState extends State<NodeEditorDataLayer>
       )!;
 
       return [
-        const MenuHeader(text: "Editor Menu"),
         MenuItem(
-          label: 'Center View',
+          label: '回到视图中心',
           icon: Icons.center_focus_strong,
           onSelected: () => widget.controller.setViewportOffset(
             Offset.zero,
@@ -611,49 +610,49 @@ class _NodeEditorDataLayerState extends State<NodeEditorDataLayer>
           ),
         ),
         MenuItem(
-          label: 'Reset Zoom',
+          label: '重置视图缩放',
           icon: Icons.zoom_in,
           onSelected: () => widget.controller.setViewportZoom(1.0),
         ),
         const MenuDivider(),
         MenuItem.submenu(
-          label: 'Create',
+          label: '添加节点',
           icon: Icons.add,
           items: createSubmenuEntries(position),
         ),
         MenuItem(
-          label: 'Paste',
+          label: '粘贴',
           icon: Icons.paste,
           onSelected: () => widget.controller.clipboard
               .pasteSelection(position: worldPosition),
         ),
         const MenuDivider(),
         MenuItem.submenu(
-          label: 'Project',
+          label: '项目',
           icon: Icons.folder,
           items: [
             MenuItem(
-              label: 'Undo',
+              label: '撤销',
               icon: Icons.undo,
               onSelected: () => widget.controller.history.undo(),
             ),
             MenuItem(
-              label: 'Redo',
+              label: '恢复',
               icon: Icons.redo,
               onSelected: () => widget.controller.history.redo(),
             ),
             MenuItem(
-              label: 'Save',
+              label: '保存',
               icon: Icons.save,
               onSelected: () => widget.controller.project.save(),
             ),
             MenuItem(
-              label: 'Open',
+              label: '打开',
               icon: Icons.folder_open,
               onSelected: () => widget.controller.project.load(),
             ),
             MenuItem(
-              label: 'New',
+              label: '新建',
               icon: Icons.new_label,
               onSelected: () => widget.controller.project.create(),
             ),
