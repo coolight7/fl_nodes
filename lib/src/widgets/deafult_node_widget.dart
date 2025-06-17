@@ -367,12 +367,14 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
           children: [
             GestureDetector(
               onTap: () => overlayEntry?.remove(),
-              child: Container(color: Colors.transparent),
+              child: Container(color: const Color.fromRGBO(0, 0, 0, 0.2)),
             ),
             Positioned(
               left: details.globalPosition.dx,
               top: details.globalPosition.dy,
               child: Material(
+                color: const Color.fromRGBO(102, 204, 255, 0.2),
+                borderRadius: BorderRadius.circular(10),
                 child: field.prototype.editorBuilder!(
                   context,
                   () => overlayEntry?.remove(),

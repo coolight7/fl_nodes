@@ -114,7 +114,7 @@ abstract class PortPrototype {
   final Type dataType;
   final PortDirection direction;
 
-  PortPrototype({
+  const PortPrototype({
     required this.idName,
     required this.displayName,
     this.styleBuilder = defaultPortStyle,
@@ -124,7 +124,7 @@ abstract class PortPrototype {
 }
 
 class DataInputPortPrototype extends PortPrototype {
-  DataInputPortPrototype({
+  const DataInputPortPrototype({
     required super.idName,
     required super.displayName,
     super.styleBuilder,
@@ -133,7 +133,7 @@ class DataInputPortPrototype extends PortPrototype {
 }
 
 class DataOutputPortPrototype extends PortPrototype {
-  DataOutputPortPrototype({
+  const DataOutputPortPrototype({
     required super.idName,
     required super.displayName,
     super.styleBuilder,
@@ -262,7 +262,7 @@ class FieldPrototype {
   final OnVisualizerTap? onVisualizerTap;
   final EditorBuilder? editorBuilder;
 
-  FieldPrototype({
+  const FieldPrototype({
     required this.idName,
     this.displayName = '',
     this.style = const FlFieldStyle(),
