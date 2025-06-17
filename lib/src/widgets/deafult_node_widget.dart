@@ -550,9 +550,8 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
 
   List<ContextMenuEntry> _defaultNodeContextMenuEntries() {
     return [
-      const MenuHeader(text: 'Node Menu'),
       MenuItem(
-        label: 'See Description',
+        label: '节点信息',
         icon: Icons.info,
         onSelected: () {
           showDialog(
@@ -574,7 +573,7 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
       ),
       const MenuDivider(),
       MenuItem(
-        label: widget.node.state.isCollapsed ? 'Expand' : 'Collapse',
+        label: widget.node.state.isCollapsed ? '展开' : '收缩',
         icon: widget.node.state.isCollapsed
             ? Icons.arrow_drop_down
             : Icons.arrow_right,
@@ -583,7 +582,7 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
       ),
       const MenuDivider(),
       MenuItem(
-        label: 'Delete',
+        label: '移除',
         icon: Icons.delete,
         onSelected: () {
           if (widget.node.state.isSelected) {
@@ -600,12 +599,12 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
         },
       ),
       MenuItem(
-        label: 'Cut',
+        label: '剪切',
         icon: Icons.content_cut,
         onSelected: () => widget.controller.clipboard.cutSelection(),
       ),
       MenuItem(
-        label: 'Copy',
+        label: '复制',
         icon: Icons.copy,
         onSelected: () => widget.controller.clipboard.copySelection(),
       ),

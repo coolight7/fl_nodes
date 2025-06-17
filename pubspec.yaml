@@ -6,6 +6,7 @@ maintainer: William Karol Di Cioccio
 homepage: https://williamkaroldicioccio.github.io/fl_nodes/
 repository: https://github.com/WilliamKarolDiCioccio/fl_nodes
 issue_tracker: https://github.com/WilliamKarolDiCioccio/fl_nodes/issues
+publish_to: 'none'
 
 platforms:
   android:
@@ -29,7 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_context_menu: ^0.2.0
+  flutter_context_menu:
+    path: ../flutter_context_menu
   flutter_shaders: ^0.1.3
   keymap: ^0.0.92
   os_detect: ^2.0.3

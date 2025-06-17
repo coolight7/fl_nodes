@@ -14,19 +14,21 @@ void createAndShowContextMenu(
 
   isContextMenuVisible = true;
 
+  dynamic result;
   final menu = ContextMenu(
     entries: entries,
     position: position,
     padding: const EdgeInsets.all(8),
   );
 
-  final copiedValue = await showContextMenu(
+  result = await showContextMenu(
     context,
     contextMenu: menu,
-  ).then((value) {
-    isContextMenuVisible = false;
-    return value;
-  });
+  );
 
-  if (onDismiss != null) onDismiss(copiedValue);
+  isContextMenuVisible = false;
+  if (result is! String) {
+    result = null;
+  }
+  onDismiss?.call(result);
 }
