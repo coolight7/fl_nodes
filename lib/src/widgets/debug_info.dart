@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fl_nodes/src/core/models/events.dart';
+import 'package:fl_nodes/src/widgets/data.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fl_nodes/src/core/controllers/node_editor/core.dart';
@@ -53,15 +54,15 @@ class _DebugInfoWidgetState extends State<DebugInfoWidget> {
         children: [
           Text(
             'X: ${viewportOffset.dx.toStringAsFixed(2)}, Y: ${viewportOffset.dy.toStringAsFixed(2)}',
-            style: const TextStyle(color: Colors.blue, fontSize: 16),
+            style: FlData_c.portTextStyle,
           ),
           Text(
             '缩放: ${viewportZoom.toStringAsFixed(2)}',
-            style: const TextStyle(color: Colors.blue, fontSize: 16),
+            style: FlData_c.portTextStyle,
           ),
           Text(
             '已选中: $selectionCount',
-            style: const TextStyle(color: Colors.blue, fontSize: 16),
+            style: FlData_c.portTextStyle,
           ),
         ],
       ),
