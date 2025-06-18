@@ -189,7 +189,7 @@ class FlNodeEditorProject {
     return (viewportOffset, viewportZoom, nodes);
   }
 
-  Map? nodesToJson() {
+  Map<String, dynamic>? nodesToJson() {
     try {
       final result = _toJson();
       return result;
