@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fl_nodes/src/core/models/events.dart';
 import 'package:flutter/material.dart';
 
@@ -19,18 +21,26 @@ class _DebugInfoWidgetState extends State<DebugInfoWidget> {
   double get viewportZoom => widget.controller.viewportZoom;
   Offset get viewportOffset => widget.controller.viewportOffset;
   int get selectionCount => widget.controller.selectedNodeIds.length;
+  StreamSubscription<NodeEditorEvent>? listener;
 
   @override
   void initState() {
     super.initState();
 
-    widget.controller.eventBus.events.listen((event) {
+    listener = widget.controller.eventBus.events.listen((event) {
       if (event is ViewportOffsetEvent ||
           event is ViewportZoomEvent ||
           event is NodeSelectionEvent) {
         setState(() {});
       }
     });
+  }
+
+  @override
+  void dispose() {
+    listener?.cancel();
+    listener = null;
+    super.dispose();
   }
 
   @override
