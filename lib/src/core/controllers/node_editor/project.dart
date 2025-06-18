@@ -189,6 +189,15 @@ class FlNodeEditorProject {
     return (viewportOffset, viewportZoom, nodes);
   }
 
+  Map? nodesToJson() {
+    try {
+      final result = _toJson();
+      return result;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// This method wraps [_toJson] and adds additional
   ///
   /// The behavior of this method is determined by the [projectSaver] callback and user defined logic.
