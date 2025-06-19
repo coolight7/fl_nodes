@@ -189,13 +189,19 @@ class FlNodeEditorProject {
     return (viewportOffset, viewportZoom, nodes);
   }
 
-  Map<String, dynamic>? nodesToJson() {
+  Map<String, dynamic>? projectToJson() {
     try {
       final result = _toJson();
       return result;
     } catch (e) {
       return null;
     }
+  }
+
+  List<Map<String, dynamic>> nodelistToJson() {
+    return controller.nodes.values
+        .map((node) => node.toJson(dataHandlers))
+        .toList();
   }
 
   /// This method wraps [_toJson] and adds additional

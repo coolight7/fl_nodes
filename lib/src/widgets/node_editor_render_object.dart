@@ -661,8 +661,11 @@ class NodeEditorRenderBox extends RenderBox
 
       for (final nodeId in visibleNodes) {
         final child = _childrenById[nodeId];
+        if (null == child) {
+          continue;
+        }
 
-        final childParentData = child!.parentData as _ParentData;
+        final childParentData = child.parentData as _ParentData;
 
         if (childParentData.state.isSelected) {
           selectedChildren.add(child);
