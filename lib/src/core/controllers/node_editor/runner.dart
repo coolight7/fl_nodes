@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fl_nodes/src/core/models/events.dart';
 import 'package:fl_nodes/src/core/utils/snackbar.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../models/entities.dart';
 
@@ -234,12 +235,16 @@ class FlNodeEditorRunner {
         forward,
         put,
       );
-    } catch (e) {
+    } catch (e, stack) {
       controller.focusNodesById({node.id});
       showNodeEditorSnackbar(
         '运行结果异常: ${node.prototype.displayName}: $e',
         SnackbarType.error,
       );
+      if (kDebugMode) {
+        print(e);
+        print(stack);
+      }
       return;
     }
 
