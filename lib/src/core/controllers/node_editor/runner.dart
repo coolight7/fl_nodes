@@ -179,6 +179,11 @@ class FlNodeEditorRunner {
   /// necessary context information and callbacks to forward events and put data.
   /// The method also handles errors and displays them in the node editor.
   Future<void> _executeNode(NodeInstance node) async {
+    if (_executedNodes.contains(node.id)) {
+      // 限制 node 只执行一次
+      return;
+    }
+
     /// A function that forwards events to connected nodes through control ports.
     ///
     /// The function takes a [Set] of unique IDs of the ports to forward events to and
