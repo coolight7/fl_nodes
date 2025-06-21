@@ -19,7 +19,7 @@ import '../core/models/events.dart';
 import '../core/models/styles.dart';
 
 import 'builders.dart';
-import 'data.dart';
+import '../data.dart';
 
 typedef _TempLink = ({String nodeId, String portId});
 

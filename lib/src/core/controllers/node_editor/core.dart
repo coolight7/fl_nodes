@@ -10,7 +10,6 @@ import 'package:fl_nodes/src/core/controllers/node_editor/history.dart';
 import 'package:fl_nodes/src/core/controllers/node_editor/project.dart';
 import 'package:fl_nodes/src/core/models/events.dart';
 import 'package:fl_nodes/src/core/utils/renderbox.dart';
-import 'package:fl_nodes/src/core/utils/snackbar.dart';
 import 'package:fl_nodes/src/core/utils/spatial_hash_grid.dart';
 
 import '../../models/config.dart';
@@ -436,15 +435,15 @@ class FlNodeEditorController {
       port1.prototype.dataType,
       port2.prototype.dataType,
     )) {
-      showNodeEditorSnackbar(
+      showTip(
         '不能连接两个不同类型的点: [${port1.prototype.dataType}] 和 [${port2.prototype.dataType}]',
-        SnackbarType.error,
+        FlMsgType.error,
       );
       return null;
     } else if (port1.prototype.direction == port2.prototype.direction) {
-      showNodeEditorSnackbar(
+      showTip(
         '不能连接两个相同输入输出方向的点: [${port1.prototype.displayName}] 和 [${port2.prototype.displayName}]',
-        SnackbarType.error,
+        FlMsgType.error,
       );
       return null;
     } else if (port1.links.any(
@@ -485,18 +484,18 @@ class FlNodeEditorController {
 
       // Check if the ports are compatible
       if (fromPort.prototype.direction == toPort.prototype.direction) {
-        showNodeEditorSnackbar(
+        showTip(
           '不能连接两个不同类型的点: [${fromPort.prototype.displayName}] 和 [${toPort.prototype.displayName}]',
-          SnackbarType.error,
+          FlMsgType.error,
         );
         return false;
       }
 
       // Check if the input port already has a link
       if (toPort.links.isNotEmpty) {
-        showNodeEditorSnackbar(
+        showTip(
           '输入点不能接受多个连接: [${toPort.prototype.displayName}] ${toNode.prototype.displayName}',
-          SnackbarType.error,
+          FlMsgType.error,
         );
         return false;
       }

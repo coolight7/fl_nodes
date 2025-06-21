@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:fl_nodes/src/data.dart';
 import 'package:flutter/material.dart';
 
 import 'package:uuid/uuid.dart';
 
 import '../../models/entities.dart';
 import '../../models/events.dart';
-import '../../utils/snackbar.dart';
 
 import 'core.dart';
 
@@ -214,10 +214,15 @@ class FlNodeEditorProject {
 
     try {
       jsonData = _toJson();
-    } catch (e) {
-      showNodeEditorSnackbar(
+    } catch (e, stack) {
+      showTip(
         '保存失败. 编码时出现错误.',
-        SnackbarType.error,
+        FlMsgType.error,
+      );
+      addLog(
+        "保存失败. 编码时出现错误: $e",
+        FlMsgType.error,
+        stack: stack,
       );
       return;
     }
@@ -231,9 +236,9 @@ class FlNodeEditorProject {
 
     controller.eventBus.emit(SaveProjectEvent(id: const Uuid().v4()));
 
-    showNodeEditorSnackbar(
+    showTip(
       '工作流已保存',
-      SnackbarType.success,
+      FlMsgType.success,
     );
   }
 
@@ -252,9 +257,9 @@ class FlNodeEditorProject {
     }
 
     if (jsonData == null) {
-      showNodeEditorSnackbar(
+      showTip(
         '加载工作流失败，无法加载数据',
-        SnackbarType.error,
+        FlMsgType.error,
       );
       return;
     }
@@ -263,19 +268,24 @@ class FlNodeEditorProject {
 
     try {
       _fromJson(jsonData);
-    } catch (e) {
-      showNodeEditorSnackbar(
+    } catch (e, stack) {
+      showTip(
         '加载工作流失败，解码错误',
-        SnackbarType.error,
+        FlMsgType.error,
+      );
+      addLog(
+        "加载工作流失败，解码错误: $e",
+        FlMsgType.error,
+        stack: stack,
       );
       return;
     }
 
     controller.eventBus.emit(LoadProjectEvent(id: const Uuid().v4()));
 
-    showNodeEditorSnackbar(
+    showTip(
       '已加载新工作流',
-      SnackbarType.success,
+      FlMsgType.success,
     );
   }
 
@@ -291,9 +301,9 @@ class FlNodeEditorProject {
 
     controller.eventBus.emit(NewProjectEvent(id: const Uuid().v4()));
 
-    showNodeEditorSnackbar(
+    showTip(
       '已创建新工作流',
-      SnackbarType.success,
+      FlMsgType.success,
     );
   }
 }

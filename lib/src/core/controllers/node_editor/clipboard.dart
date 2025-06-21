@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fl_nodes/src/data.dart';
 import 'package:flutter/services.dart';
 
 import 'package:uuid/uuid.dart';
@@ -9,7 +10,6 @@ import '../../models/entities.dart';
 import '../../models/events.dart';
 import '../../utils/json_extensions.dart';
 import '../../utils/renderbox.dart';
-import '../../utils/snackbar.dart';
 
 import 'core.dart';
 import 'event_bus.dart';
@@ -83,19 +83,24 @@ class FlNodeEditorClipboard {
       });
 
       base64Data = base64Encode(utf8.encode(jsonData));
-    } catch (e) {
-      showNodeEditorSnackbar(
-        '复制失败，编码错误. ($e)',
-        SnackbarType.error,
+    } catch (e, stack) {
+      showTip(
+        '复制失败，编码错误. $e',
+        FlMsgType.error,
+      );
+      addLog(
+        "复制失败，编码错误: $e",
+        FlMsgType.error,
+        stack: stack,
       );
       return '';
     }
 
     await Clipboard.setData(ClipboardData(text: base64Data));
 
-    showNodeEditorSnackbar(
+    showTip(
       '已复制节点到剪切板',
-      SnackbarType.success,
+      FlMsgType.success,
     );
 
     eventBus.emit(
@@ -131,10 +136,15 @@ class FlNodeEditorClipboard {
       encompassingRect = JSONRect.fromJson(
         jsonDecode(jsonData['encompassingRect']),
       );
-    } catch (e) {
-      showNodeEditorSnackbar(
-        '粘贴失败，解码错误. ($e)',
-        SnackbarType.error,
+    } catch (e, stack) {
+      showTip(
+        '粘贴失败，解码错误. $e',
+        FlMsgType.error,
+      );
+      addLog(
+        "粘贴失败，解码错误: $e",
+        FlMsgType.error,
+        stack: stack,
       );
       return;
     }

@@ -1,14 +1,13 @@
-library fl_nodes;
+library;
 
 export 'package:fl_nodes/src/core/models/styles.dart';
+export 'package:fl_nodes/src/data.dart';
 export 'package:fl_nodes/src/core/models/entities.dart'
     show
         Link,
         NodePrototype,
         DataInputPortPrototype,
         DataOutputPortPrototype,
-        ControlInputPortPrototype,
-        ControlOutputPortPrototype,
         FieldPrototype,
         PortInstance,
         FieldInstance,

@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:fl_nodes/src/core/models/events.dart';
-import 'package:fl_nodes/src/core/utils/snackbar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:fl_nodes/src/data.dart';
 
 import '../../models/entities.dart';
 
 import 'core.dart';
 
 typedef OnExecute = Future<void> Function(
+  FlNodeEditorController ctrl,
   Map<String, dynamic> ports,
   Map<String, dynamic> fields,
   Map<String, dynamic> execState,
@@ -26,6 +26,9 @@ class FlNodeEditorRunner {
 
   Set<String> _executedNodes = {};
   Map<String, Map<String, dynamic>> _execState = {};
+
+  final globalContext = <String, dynamic>{};
+  final onceRuntimeContext = <String, dynamic>{};
 
   FlNodeEditorRunner(this.controller) {
     controller.eventBus.events.listen(_handleRunnerEvents);
@@ -169,6 +172,7 @@ class FlNodeEditorRunner {
   Future<void> executeGraph() async {
     _executedNodes = {};
     _execState = {};
+    onceRuntimeContext.clear();
 
     for (final node in _nodes.values) {
       if (!node.ports.values.every(
@@ -243,6 +247,7 @@ class FlNodeEditorRunner {
 
     try {
       await node.prototype.onExecute(
+        controller,
         node.ports.map((portId, port) => MapEntry(portId, port.data)),
         node.fields.map((fieldId, field) => MapEntry(fieldId, field.data)),
         _execState.putIfAbsent(node.id, () => {}),
@@ -251,14 +256,15 @@ class FlNodeEditorRunner {
       );
     } catch (e, stack) {
       controller.focusNodesById({node.id});
-      showNodeEditorSnackbar(
+      showTip(
         '运行结果异常: ${node.prototype.displayName}: $e',
-        SnackbarType.error,
+        FlMsgType.error,
       );
-      if (kDebugMode) {
-        print(e);
-        print(stack);
-      }
+      addLog(
+        "运行结果异常: ${node.prototype.displayName}: $e",
+        FlMsgType.error,
+        stack: stack,
+      );
       return;
     }
 
