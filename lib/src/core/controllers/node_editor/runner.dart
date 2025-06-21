@@ -156,6 +156,15 @@ class FlNodeEditorRunner {
     return connectedNodeIds;
   }
 
+  Set<String> resetExecutedNodes(Set<String>? sign) {
+    final temp = _executedNodes.toSet();
+    if (null == sign) {
+      return temp;
+    }
+    _executedNodes = sign;
+    return temp;
+  }
+
   /// Executes the entire graph asynchronously
   Future<void> executeGraph() async {
     _executedNodes = {};
