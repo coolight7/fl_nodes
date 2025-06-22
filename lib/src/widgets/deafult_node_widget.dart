@@ -264,16 +264,15 @@ class _DefaultNodeWidgetState extends State<DefaultNodeWidget> {
             decoration: field.prototype.style.decoration,
             child: Row(
               children: [
-                Flexible(
-                  child: Text(
-                    field.prototype.displayName,
-                    style: FlData_c.fieldTextStyle ??
-                        const TextStyle(color: Colors.white70, fontSize: 13),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                Text(
+                  field.prototype.displayName,
+                  style: FlData_c.fieldTextStyle ??
+                      const TextStyle(color: Colors.white70, fontSize: 13),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: field.prototype.visualizerBuilder(field.data)),
+                const Expanded(child: SizedBox()),
+                field.prototype.visualizerBuilder(field.data),
               ],
             ),
           );

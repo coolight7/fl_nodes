@@ -257,11 +257,11 @@ class FlNodeEditorRunner {
     } catch (e, stack) {
       controller.focusNodesById({node.id});
       showTip(
-        '运行结果异常: ${node.prototype.displayName}: $e',
+        '运行结果异常: [${node.prototype.displayName}]: $e',
         FlMsgType.error,
       );
       addLog(
-        "运行结果异常: ${node.prototype.displayName}: $e",
+        "运行结果异常: [${node.prototype.displayName}]: $e",
         FlMsgType.error,
         stack: stack,
       );

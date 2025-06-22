@@ -236,7 +236,7 @@ final class PortInstance {
   }
 }
 
-typedef OnVisualizerTap = Function(
+typedef OnVisualizerTap = void Function(
   dynamic data,
   Function(dynamic data) setData,
 );
