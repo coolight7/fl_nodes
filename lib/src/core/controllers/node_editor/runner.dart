@@ -9,6 +9,7 @@ import 'core.dart';
 
 typedef OnExecute = Future<void> Function(
   FlNodeEditorController ctrl,
+  NodeInstance node,
   Map<String, dynamic> ports,
   Map<String, dynamic> fields,
   Map<String, dynamic> execState,
@@ -23,6 +24,7 @@ class FlNodeEditorRunner {
   final FlNodeEditorController controller;
   Map<String, NodeInstance> _nodes = {};
   Map<String, Set<String>> _dataDeps = {};
+  Map<String, Set<String>> _outputDeps = {};
 
   Set<String> _executedNodes = {};
   Map<String, Map<String, dynamic>> _execState = {};
@@ -37,6 +39,7 @@ class FlNodeEditorRunner {
   void dispose() {
     _nodes = {};
     _dataDeps = {};
+    _outputDeps = {};
     _executedNodes = {};
     _execState = {};
   }
@@ -90,6 +93,7 @@ class FlNodeEditorRunner {
   /// This map is used to determine the order in which nodes are executed to ensure that data is propagated correctly.
   void _buildDepsMap() {
     _dataDeps = {};
+    _outputDeps = {};
 
     _copyNodes();
 
@@ -120,6 +124,7 @@ class FlNodeEditorRunner {
       _nodes[nodeId]!,
       PortDirection.output,
     );
+    _outputDeps[nodeId] = connectedOutputNodeIds;
 
     for (final connectedNodeId in connectedOutputNodeIds) {
       _findDeps(connectedNodeId, visited);
@@ -159,13 +164,24 @@ class FlNodeEditorRunner {
     return connectedNodeIds;
   }
 
-  Set<String> resetExecutedNodes(Set<String>? sign) {
+  Set<String> resetNodesExecSign(Set<String>? sign) {
     final temp = _executedNodes.toSet();
     if (null == sign) {
       return temp;
     }
     _executedNodes = sign;
     return temp;
+  }
+
+  void resetOuputNodesExecSign(String nodeId) {
+    for (final id in _outputDeps[nodeId]!) {
+      _executedNodes.remove(id);
+      final item = _nodes[id];
+      if (null == item) {
+        continue;
+      }
+      resetOuputNodesExecSign(item.id);
+    }
   }
 
   /// Executes the entire graph asynchronously
@@ -196,6 +212,7 @@ class FlNodeEditorRunner {
       // 限制 node 只执行一次
       return;
     }
+    _executedNodes.add(node.id);
 
     /// A function that forwards events to connected nodes through control ports.
     ///
@@ -238,8 +255,6 @@ class FlNodeEditorRunner {
       }
     }
 
-    _executedNodes.add(node.id);
-
     for (final dep in _dataDeps[node.id]!) {
       if (_executedNodes.contains(dep)) continue;
       await _executeNode(_nodes[dep]!);
@@ -248,12 +263,14 @@ class FlNodeEditorRunner {
     try {
       await node.prototype.onExecute(
         controller,
+        node,
         node.ports.map((portId, port) => MapEntry(portId, port.data)),
         node.fields.map((fieldId, field) => MapEntry(fieldId, field.data)),
         _execState.putIfAbsent(node.id, () => {}),
         forward,
         put,
       );
+      _execState.remove(node.id);
     } catch (e, stack) {
       controller.focusNodesById({node.id});
       showTip(
@@ -265,9 +282,7 @@ class FlNodeEditorRunner {
         FlMsgType.error,
         stack: stack,
       );
-      return;
     }
-
-    _execState.remove(node.id);
+    _executedNodes.add(node.id);
   }
 }
