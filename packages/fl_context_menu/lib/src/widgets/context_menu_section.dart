@@ -2,6 +2,7 @@ import 'package:fl_context_menu/src/core/models/entries.dart';
 import 'package:fl_context_menu/src/styles/styles.dart';
 import 'package:fl_context_menu/src/widgets/item_tile.dart';
 import 'package:fl_context_menu/src/widgets/submenu_tile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class FlMenuSectionWidget extends StatelessWidget {
@@ -32,7 +33,7 @@ class FlMenuSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final itemStyle = style.itemStyle;
+    final FlMenuItemStyle itemStyle = style.itemStyle;
 
     return Padding(
       padding: data.padding ?? const EdgeInsets.symmetric(vertical: 2),
@@ -93,5 +94,14 @@ class FlMenuSectionWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<FlMenuSectionDataModel>('data', data))
+      ..add(DiagnosticsProperty<FlMenuStyle>('style', style))
+      ..add(IntProperty('menuLevel', menuLevel));
   }
 }

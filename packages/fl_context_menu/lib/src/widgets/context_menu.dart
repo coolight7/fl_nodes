@@ -2,6 +2,7 @@ import 'package:fl_context_menu/src/core/models/config.dart';
 import 'package:fl_context_menu/src/core/models/entries.dart';
 import 'package:fl_context_menu/src/styles/styles.dart';
 import 'package:fl_context_menu/src/widgets/context_menu_section.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class FlMenuWidget extends StatelessWidget {
@@ -27,9 +28,7 @@ class FlMenuWidget extends StatelessWidget {
       case 2:
         return baseStyle.secondLevelMenuStyle ?? baseStyle;
       case 3:
-        return baseStyle.thirdLevelMenuStyle ??
-            baseStyle.secondLevelMenuStyle ??
-            baseStyle;
+        return baseStyle.thirdLevelMenuStyle ?? baseStyle.secondLevelMenuStyle ?? baseStyle;
       default:
         return baseStyle.nThLevelMenuStyle ??
             baseStyle.thirdLevelMenuStyle ??
@@ -39,14 +38,14 @@ class FlMenuWidget extends StatelessWidget {
   }
 
   Widget _buildMenuMaterial() {
-    final resolvedStyle = _resolveStyle(style, menuLevel);
-    final dividerStyle = resolvedStyle.dividerStyle;
+    final FlMenuStyle resolvedStyle = _resolveStyle(style, menuLevel);
+    final FlMenuDividerStyle dividerStyle = resolvedStyle.dividerStyle;
 
     return Material(
       elevation: resolvedStyle.elevation,
       color: resolvedStyle.decoration.color ?? const Color(0xFF1E1E1E),
-      borderRadius: resolvedStyle.decoration.borderRadius as BorderRadius? ??
-          BorderRadius.circular(8),
+      borderRadius:
+          resolvedStyle.decoration.borderRadius as BorderRadius? ?? BorderRadius.circular(8),
       child: Container(
         constraints: BoxConstraints(
           minWidth: config.minWidth,
@@ -100,5 +99,16 @@ class FlMenuWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<FlMenuDataModel>('data', data))
+      ..add(DiagnosticsProperty<Offset>('position', position))
+      ..add(DiagnosticsProperty<FlMenuConfig>('config', config))
+      ..add(DiagnosticsProperty<FlMenuStyle>('style', style))
+      ..add(IntProperty('menuLevel', menuLevel));
   }
 }

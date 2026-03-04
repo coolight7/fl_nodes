@@ -1,10 +1,18 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
 import 'package:fl_nodes_core/src/constants.dart';
+import 'package:fl_nodes_core/src/core/controller/core.dart';
+import 'package:fl_nodes_core/src/core/events/events.dart';
+import 'package:fl_nodes_core/src/core/models/data.dart';
+import 'package:fl_nodes_core/src/core/models/paint.dart';
+import 'package:fl_nodes_core/src/core/utils/rendering/paths.dart';
 import 'package:fl_nodes_core/src/painters/links.dart';
 import 'package:fl_nodes_core/src/painters/selection_area.dart';
 import 'package:fl_nodes_core/src/painters/tmp_link.dart';
+import 'package:fl_nodes_core/src/styles/styles.dart';
+import 'package:fl_nodes_core/src/widgets/builders.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +23,6 @@ import 'package:flutter_shaders/flutter_shaders.dart';
 import 'package:uuid/uuid.dart';
 import 'package:vector_math/vector_math.dart' as vec;
 import 'package:vector_math/vector_math_64.dart' hide Colors;
-
-import '../core/controller/core.dart';
-import '../core/events/events.dart';
-import '../core/models/data.dart';
-import '../core/models/paint.dart';
-import '../core/utils/rendering/paths.dart';
-import '../styles/styles.dart';
-import 'builders.dart';
 
 class _NodeDiffCheckData {
   String id;
@@ -57,7 +57,7 @@ class NodeEditorRenderObjectWidget extends MultiChildRenderObjectWidget {
   final FlNodesController controller;
   final FragmentShader gridShader;
   final NodeBuilder nodeBuilder;
-  final Function(String linkId, Offset position)? showLinkContextMenu;
+  final void Function(String linkId, Offset position)? showLinkContextMenu;
 
   NodeEditorRenderObjectWidget({
     super.key,
@@ -74,22 +74,34 @@ class NodeEditorRenderObjectWidget extends MultiChildRenderObjectWidget {
         );
 
   @override
-  NodeEditorRenderBox createRenderObject(BuildContext context) {
-    return NodeEditorRenderBox(
-      controller: controller,
-      gridShader: gridShader,
-      isModalPresent: ModalRoute.of(context)?.isCurrent ?? false,
-      showLinkContextMenu: showLinkContextMenu,
-    );
-  }
+  NodeEditorRenderBox createRenderObject(BuildContext context) => NodeEditorRenderBox(
+        controller: controller,
+        gridShader: gridShader,
+        isModalPresent: ModalRoute.of(context)?.isCurrent ?? false,
+        showLinkContextMenu: showLinkContextMenu,
+      );
 
   @override
   void updateRenderObject(
     BuildContext context,
     NodeEditorRenderBox renderObject,
   ) {
-    renderObject.gridShader = gridShader;
-    renderObject.isModalPresent = ModalRoute.of(context)?.isCurrent == false;
+    renderObject
+      ..gridShader = gridShader
+      ..isModalPresent = ModalRoute.of(context)?.isCurrent == false;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    // dart format off
+    properties
+      ..add(DiagnosticsProperty<FlNodesController>('controller', controller))
+      ..add(DiagnosticsProperty<ui.FragmentShader>('gridShader', gridShader))
+      ..add(ObjectFlagProperty<NodeBuilder>.has('nodeBuilder', nodeBuilder))
+      ..add(ObjectFlagProperty<void Function(String linkId, ui.Offset position)?>.has(
+          'showLinkContextMenu', showLinkContextMenu));
+    // dart format on
   }
 }
 
@@ -101,7 +113,7 @@ class NodeEditorRenderBox extends RenderBox
     required FlNodesController controller,
     required FragmentShader gridShader,
     required bool isModalPresent,
-    required Function(String portId, Offset position)? showLinkContextMenu,
+    required void Function(String portId, Offset position)? showLinkContextMenu,
   })  : _controller = controller,
         _gridShader = gridShader,
         _isModalPresent = isModalPresent,
@@ -116,8 +128,10 @@ class NodeEditorRenderBox extends RenderBox
     _offset = _controller.viewportOffset;
     _zoom = _controller.viewportZoom;
 
-    _controller.eventBus.events.listen(_handleControllerEvent);
+    _eventSubscription = _controller.eventBus.events.listen(_handleControllerEvent);
   }
+
+  late final StreamSubscription<NodeEditorEvent> _eventSubscription;
 
   void _handleControllerEvent(NodeEditorEvent event) {
     if (event is! FlPaintEventCat && event is! FlLayoutEventCat) return;
@@ -187,7 +201,7 @@ class NodeEditorRenderBox extends RenderBox
   }
 
   final FlNodesController _controller;
-  final Function(String linkId, Offset position)? _showLinkContextMenu;
+  final void Function(String linkId, Offset position)? _showLinkContextMenu;
 
   final Map<String, RenderBox> _childrenById = {};
 
@@ -226,22 +240,20 @@ class NodeEditorRenderBox extends RenderBox
 
   List<_NodeDiffCheckData> _nodesDiffCheckData = [];
 
-  List<_NodeDiffCheckData> _getNodeDiffData() {
-    return _controller.nodesAsList
-        .map(
-          (node) => _NodeDiffCheckData(
-            id: node.id,
-            offset: node.offset,
-            state: node.state,
-          ),
-        )
-        .toList();
-  }
+  List<_NodeDiffCheckData> _getNodeDiffData() => _controller.nodesAsList
+      .map(
+        (node) => _NodeDiffCheckData(
+          id: node.id,
+          offset: node.offset,
+          state: node.state,
+        ),
+      )
+      .toList();
 
   LinkPaintModel? _getTmpLinkData() {
     if (_controller.tempLink == null) return null;
 
-    final link = _controller.tempLink!;
+    final TempLinkDataModel link = _controller.tempLink!;
 
     return LinkPaintModel(
       linkId: 'temp_link',
@@ -254,24 +266,24 @@ class NodeEditorRenderBox extends RenderBox
   }
 
   void _loadGridShader() => gridShader.setFloatUniforms((uniforms) {
-        final gridStyle = _controller.style.gridStyle;
+        final FlGridStyle gridStyle = _controller.style.gridStyle;
 
-        // uniform vec2 uGridSpacing
-        uniforms.setVector(
-          vec.Vector2(gridStyle.gridSpacingX, gridStyle.gridSpacingY),
-        );
+        uniforms
 
-        // uniform float uLineWidth
-        uniforms.setFloat(gridStyle.lineWidth);
+          // uniform vec2 uGridSpacing
+          ..setVector(vec.Vector2(gridStyle.gridSpacingX, gridStyle.gridSpacingY))
 
-        // uniform vec4 uLineColor
-        uniforms.setColor(gridStyle.lineColor, premultiply: true);
+          // uniform float uLineWidth
+          ..setFloat(gridStyle.lineWidth)
 
-        // uniform float uIntersectionRadius
-        uniforms.setFloat(gridStyle.intersectionRadius);
+          // uniform vec4 uLineColor
+          ..setColor(gridStyle.lineColor, premultiply: true)
 
-        // uniform vec4 uIntersectionColor
-        uniforms.setColor(gridStyle.intersectionColor, premultiply: true);
+          // uniform float uIntersectionRadius
+          ..setFloat(gridStyle.intersectionRadius)
+
+          // uniform vec4 uIntersectionColor
+          ..setColor(gridStyle.intersectionColor, premultiply: true);
       });
 
   /// This method can be called directly only if the event is affecting the existing nodes data and not the widget tree.
@@ -293,7 +305,7 @@ class NodeEditorRenderBox extends RenderBox
     // Walk current children in order
     while (child != null && index < _nodesDiffCheckData.length) {
       final childParentData = child.parentData! as _ParentData;
-      final nodeData = _nodesDiffCheckData[index];
+      final _NodeDiffCheckData nodeData = _nodesDiffCheckData[index];
 
       // This node still exists, remove it from the "removed" set
       removedNodes.remove(nodeData.id);
@@ -303,10 +315,11 @@ class NodeEditorRenderBox extends RenderBox
           childParentData.offset != nodeData.offset ||
           childParentData.state.isCollapsed != nodeData.state.isCollapsed ||
           _childrenById[nodeData.id] != child) {
-        childParentData.id = nodeData.id;
-        childParentData.offset = nodeData.offset;
-        childParentData.state = nodeData.state;
-        childParentData.rect = Rect.zero;
+        childParentData
+          ..id = nodeData.id
+          ..offset = nodeData.offset
+          ..state = nodeData.state
+          ..rect = Rect.zero;
 
         _childrenById[nodeData.id] = child;
         _childrenNotLaidOut.add(nodeData.id);
@@ -352,7 +365,7 @@ class NodeEditorRenderBox extends RenderBox
 
     super.insert(child, after: after);
 
-    final currentIdx = lastChildIdx();
+    final int currentIdx = lastChildIdx();
 
     if (currentIdx >= _nodesDiffCheckData.length) {
       throw Exception(
@@ -360,22 +373,23 @@ class NodeEditorRenderBox extends RenderBox
       );
     }
 
-    final parentData = child.parentData as _ParentData;
+    final parentData = child.parentData! as _ParentData;
 
-    final diffCheckData = _nodesDiffCheckData[currentIdx];
+    final _NodeDiffCheckData diffCheckData = _nodesDiffCheckData[currentIdx];
 
-    parentData.id = diffCheckData.id;
-    parentData.offset = diffCheckData.offset;
-    parentData.state = diffCheckData.state;
+    parentData
+      ..id = diffCheckData.id
+      ..offset = diffCheckData.offset
+      ..state = diffCheckData.state;
 
-    final decoration =
+    final BoxDecoration? decoration =
         _controller.getNodeById(diffCheckData.id)?.builtStyle.decoration;
 
     if (decoration?.borderRadius is BorderRadius) {
-      final borderRadius = decoration!.borderRadius as BorderRadius;
+      final borderRadius = decoration!.borderRadius! as BorderRadius;
       parentData.borderRadius = borderRadius.topLeft.x;
     } else if (decoration?.borderRadius is Radius) {
-      final radius = decoration!.borderRadius as Radius;
+      final radius = decoration!.borderRadius! as Radius;
       parentData.borderRadius = radius.x;
     } else {
       parentData.borderRadius = 8.0;
@@ -418,12 +432,12 @@ class NodeEditorRenderBox extends RenderBox
     // If the child has not been laid out yet, we need to layout it.
     // Otherwise, we only need to layout it if it's within the viewport.
 
-    for (final nodeId in _childrenNotLaidOut) {
-      final child = _childrenById[nodeId];
+    for (final String nodeId in _childrenNotLaidOut) {
+      final RenderBox? child = _childrenById[nodeId];
 
       if (child == null) continue;
 
-      final childParentData = child.parentData as _ParentData;
+      final childParentData = child.parentData! as _ParentData;
 
       child.layout(
         BoxConstraints.loose(constraints.biggest),
@@ -439,8 +453,7 @@ class NodeEditorRenderBox extends RenderBox
 
       childParentData.rect = renderBoxRect;
 
-      _controller.nodesSpatialHashGrid
-          .update((id: nodeId, rect: renderBoxRect));
+      _controller.nodesSpatialHashGrid.update((id: nodeId, rect: renderBoxRect));
 
       _controller.getNodeById(nodeId)!.cachedRenderboxRect = renderBoxRect;
     }
@@ -451,14 +464,12 @@ class NodeEditorRenderBox extends RenderBox
     // This action is delayed until the paint method to ensure all layout operations are done.
   }
 
-  Rect _calculateViewport() {
-    return Rect.fromLTWH(
-      -size.width / 2 / _zoom - _offset.dx,
-      -size.height / 2 / _zoom - _offset.dy,
-      size.width / _zoom,
-      size.height / _zoom,
-    );
-  }
+  Rect _calculateViewport() => Rect.fromLTWH(
+        -size.width / 2 / _zoom - _offset.dx,
+        -size.height / 2 / _zoom - _offset.dy,
+        size.width / _zoom,
+        size.height / _zoom,
+      );
 
   /// We need to manually mark the transform matrix when the viewport resizes
   Size _lastViewportSize = Size.zero;
@@ -470,7 +481,7 @@ class NodeEditorRenderBox extends RenderBox
       _transformChanged = true;
     }
 
-    final viewport = _prepareCanvas(context.canvas, size);
+    final ui.Rect viewport = _prepareCanvas(context.canvas, size);
 
     // Performing the visibility update here ensures all layout operations are done.
 
@@ -524,7 +535,7 @@ class NodeEditorRenderBox extends RenderBox
   Rect _prepareCanvas(Canvas canvas, Size size) {
     canvas.transform(_getTransformMatrix().storage);
 
-    final viewport = _calculateViewport();
+    final ui.Rect viewport = _calculateViewport();
 
     canvas.clipRect(
       viewport,
@@ -578,16 +589,16 @@ class NodeEditorRenderBox extends RenderBox
 
       final Set<PortPaintModel> portData = {};
 
-      for (final nodeId in _visibleNodes) {
-        final child = _childrenById[nodeId];
+      for (final String nodeId in _visibleNodes) {
+        final RenderBox? child = _childrenById[nodeId];
 
-        final childParentData = child!.parentData as _ParentData;
+        final childParentData = child!.parentData! as _ParentData;
 
         if (childParentData.state.isSelected) {
           selectedChildren.add(child);
 
           if (_controller.style.nodesShadow != null) {
-            final shadow = _controller.style.nodesShadow!;
+            final BoxShadow shadow = _controller.style.nodesShadow!;
 
             selectedShadowPath.addRRect(
               RRect.fromRectAndRadius(
@@ -599,7 +610,7 @@ class NodeEditorRenderBox extends RenderBox
 
           if (lodLevel <= 2 || childParentData.state.isCollapsed) continue;
 
-          for (final port in _controller.getNodeById(nodeId)!.ports.values) {
+          for (final FlPortDataModel port in _controller.getNodeById(nodeId)!.ports.values) {
             portData.add(
               PortPaintModel(
                 locator: (nodeId: nodeId, portId: port.prototype.idName),
@@ -613,7 +624,7 @@ class NodeEditorRenderBox extends RenderBox
           unselectedChildren.add(child);
 
           if (_controller.style.nodesShadow != null) {
-            final shadow = _controller.style.nodesShadow!;
+            final BoxShadow shadow = _controller.style.nodesShadow!;
 
             unselectedShadowPath.addRRect(
               RRect.fromRectAndRadius(
@@ -625,7 +636,7 @@ class NodeEditorRenderBox extends RenderBox
 
           if (lodLevel <= 2 || childParentData.state.isCollapsed) continue;
 
-          for (final port in _controller.getNodeById(nodeId)!.ports.values) {
+          for (final FlPortDataModel port in _controller.getNodeById(nodeId)!.ports.values) {
             portData.add(
               PortPaintModel(
                 locator: (nodeId: nodeId, portId: port.prototype.idName),
@@ -639,20 +650,20 @@ class NodeEditorRenderBox extends RenderBox
       }
 
       for (final data in portData) {
-        final style = data.style;
+        final FlPortStyle style = data.style;
 
-        final batchPortByStyle = data.isSelected
-            ? batchSelectedPortByStyle
-            : batchUnselectedPortByStyle;
+        final Map<FlPortStyle, (ui.Path, ui.Paint)> batchPortByStyle =
+            data.isSelected ? batchSelectedPortByStyle : batchUnselectedPortByStyle;
 
-        batchPortByStyle.putIfAbsent(style, () {
-          return (
+        batchPortByStyle.putIfAbsent(
+          style,
+          () => (
             Path(),
             Paint()
               ..color = style.color
               ..style = PaintingStyle.fill,
-          );
-        });
+          ),
+        );
 
         late Path path;
 
@@ -683,7 +694,7 @@ class NodeEditorRenderBox extends RenderBox
 
     // First we paint the unselected nodes, so they appear below the selected ones.
 
-    final shadow = _controller.style.nodesShadow;
+    final BoxShadow? shadow = _controller.style.nodesShadow;
 
     if (lodLevel == 4 && shadow != null) {
       context.canvas.drawShadow(
@@ -694,14 +705,15 @@ class NodeEditorRenderBox extends RenderBox
       );
     }
 
-    for (final unselectedChild in unselectedChildren) {
+    for (final RenderBox unselectedChild in unselectedChildren) {
       final childParentData = unselectedChild.parentData! as _ParentData;
       context.paintChild(unselectedChild, childParentData.offset);
     }
 
     if (lodLevel >= 3) {
-      for (final entry in batchUnselectedPortByStyle.entries) {
-        final (path, paint) = entry.value;
+      for (final MapEntry<FlPortStyle, (ui.Path, ui.Paint)> entry
+          in batchUnselectedPortByStyle.entries) {
+        final (ui.Path path, ui.Paint paint) = entry.value;
         context.canvas.drawPath(path, paint);
       }
     }
@@ -717,14 +729,15 @@ class NodeEditorRenderBox extends RenderBox
       );
     }
 
-    for (final selectedChild in selectedChildren) {
+    for (final RenderBox selectedChild in selectedChildren) {
       final childParentData = selectedChild.parentData! as _ParentData;
       context.paintChild(selectedChild, childParentData.offset);
     }
 
     if (lodLevel >= 3) {
-      for (final entry in batchSelectedPortByStyle.entries) {
-        final (path, paint) = entry.value;
+      for (final MapEntry<FlPortStyle, (ui.Path, ui.Paint)> entry
+          in batchSelectedPortByStyle.entries) {
+        final (ui.Path path, ui.Paint paint) = entry.value;
         context.canvas.drawPath(path, paint);
       }
     }
@@ -763,23 +776,21 @@ class NodeEditorRenderBox extends RenderBox
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    final Offset centeredPosition =
-        position - Offset(size.width / 2, size.height / 2);
+    final Offset centeredPosition = position - Offset(size.width / 2, size.height / 2);
     final Offset scaledPosition = centeredPosition.scale(1 / _zoom, 1 / _zoom);
     final Offset transformedPosition = scaledPosition - _offset;
 
-    for (final nodeId in _controller.nodesSpatialHashGrid.queryCoords(
+    for (final String nodeId in _controller.nodesSpatialHashGrid.queryCoords(
       transformedPosition,
     )) {
-      final child = _childrenById[nodeId]!;
-      final childParentData = child.parentData as _ParentData;
+      final RenderBox child = _childrenById[nodeId]!;
+      final childParentData = child.parentData! as _ParentData;
 
       final bool isHit = result.addWithPaintOffset(
         offset: childParentData.offset,
         position: transformedPosition,
-        hitTest: (BoxHitTestResult result, Offset transformed) {
-          return child.hitTest(result, position: transformed);
-        },
+        hitTest: (BoxHitTestResult result, Offset transformed) =>
+            child.hitTest(result, position: transformed),
       );
 
       if (isHit) {
@@ -808,8 +819,7 @@ class NodeEditorRenderBox extends RenderBox
   ) {
     if (event is! PointerDownEvent && event is! PointerHoverEvent) return false;
 
-    final nodeIds =
-        _controller.nodesSpatialHashGrid.queryCoords(transformedPosition);
+    final Set<String> nodeIds = _controller.nodesSpatialHashGrid.queryCoords(transformedPosition);
 
     if (nodeIds.isEmpty) {
       if (event is PointerHoverEvent) {
@@ -821,8 +831,8 @@ class NodeEditorRenderBox extends RenderBox
     // Find the topmost node that contains the position
     String? hitNodeId;
     for (final nodeId in nodeIds) {
-      final child = _childrenById[nodeId]!;
-      final childParentData = child.parentData as _ParentData;
+      final RenderBox child = _childrenById[nodeId]!;
+      final childParentData = child.parentData! as _ParentData;
 
       // Based on the level of detail, we use reduce the complexity of the hit testing.
       if (lodLevel >= 3) {
@@ -879,7 +889,7 @@ class NodeEditorRenderBox extends RenderBox
       return false;
     }
 
-    final hitLinkId = _findHitLink(transformedPosition, checkRect);
+    final String? hitLinkId = _findHitLink(transformedPosition, checkRect);
     if (hitLinkId == null) {
       if (event is PointerHoverEvent) {
         _clearLinkHover();
@@ -889,13 +899,12 @@ class NodeEditorRenderBox extends RenderBox
 
     // Check if there's a node overlapping the link at this position
     // Nodes have higher priority than links
-    final nodeIds =
-        _controller.nodesSpatialHashGrid.queryCoords(transformedPosition);
+    final Set<String> nodeIds = _controller.nodesSpatialHashGrid.queryCoords(transformedPosition);
 
     if (nodeIds.isNotEmpty) {
       for (final nodeId in nodeIds) {
-        final child = _childrenById[nodeId]!;
-        final childParentData = child.parentData as _ParentData;
+        final RenderBox child = _childrenById[nodeId]!;
+        final childParentData = child.parentData! as _ParentData;
 
         final childRect = RRect.fromRectAndRadius(
           Rect.fromLTWH(
@@ -931,7 +940,7 @@ class NodeEditorRenderBox extends RenderBox
   ) {
     if (event is! PointerHoverEvent) return false;
 
-    final hitPortLocator = _findHitPort(transformedPosition, checkRect);
+    final PortLocator? hitPortLocator = _findHitPort(transformedPosition, checkRect);
     final isHit = hitPortLocator != null;
 
     if (isHit) {
@@ -953,9 +962,10 @@ class NodeEditorRenderBox extends RenderBox
   String? _findHitLink(Offset transformedPosition, Rect checkRect) {
     const tolerance = 4.0;
 
-    for (final entry in _linksCustomPainter.linksHitTestData.entries) {
-      final id = entry.key;
-      final pathData = entry.value;
+    for (final MapEntry<String, (ui.Rect, ui.Path)> entry
+        in _linksCustomPainter.linksHitTestData.entries) {
+      final String id = entry.key;
+      final (ui.Rect, ui.Path) pathData = entry.value;
 
       if (checkRect.overlaps(pathData.$1)) {
         if (PathUtils.isPointNearPath(
@@ -1030,11 +1040,7 @@ class NodeEditorRenderBox extends RenderBox
     _clearNodeHover();
     _clearPortHover();
 
-    _controller
-        .getNodeById(portLocator.nodeId)!
-        .ports[portLocator.portId]!
-        .state
-        .isHovered = true;
+    _controller.getNodeById(portLocator.nodeId)!.ports[portLocator.portId]!.state.isHovered = true;
     _controller.nodesDataDirty = true;
     lastHoveredPortLocator = portLocator;
 
@@ -1047,8 +1053,7 @@ class NodeEditorRenderBox extends RenderBox
 
   /// Clears hover state for nodes
   void _clearNodeHover() {
-    if (lastHoveredNodeId == null ||
-        !_controller.isNodePresent(lastHoveredNodeId!)) {
+    if (lastHoveredNodeId == null || !_controller.isNodePresent(lastHoveredNodeId!)) {
       return;
     }
 
@@ -1070,8 +1075,7 @@ class NodeEditorRenderBox extends RenderBox
 
   /// Clears hover state for links
   void _clearLinkHover() {
-    if (lastHoveredLinkId == null ||
-        !_controller.links.containsKey(lastHoveredLinkId!)) {
+    if (lastHoveredLinkId == null || !_controller.links.containsKey(lastHoveredLinkId)) {
       return;
     }
 
@@ -1113,8 +1117,7 @@ class NodeEditorRenderBox extends RenderBox
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     super.handleEvent(event, entry);
 
-    final Offset centeredPosition =
-        event.localPosition - Offset(size.width / 2, size.height / 2);
+    final Offset centeredPosition = event.localPosition - Offset(size.width / 2, size.height / 2);
     final Offset scaledPosition = centeredPosition.scale(1 / _zoom, 1 / _zoom);
     final Offset transformedPosition = scaledPosition - _offset;
 
@@ -1184,8 +1187,36 @@ class NodeEditorRenderBox extends RenderBox
   //////////////////////////////////////////////////////////////////
 
   @override
+  void dispose() {
+    _eventSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
   bool get isRepaintBoundary => true;
 
   @override
   bool get alwaysNeedsCompositing => false;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    // dart format off
+    properties
+      ..add(DiagnosticsProperty<ui.FragmentShader>('gridShader', gridShader))
+      ..add(IntProperty('lodLevel', lodLevel))
+      ..add(IterableProperty<RenderBox>('selectedChildren', selectedChildren))
+      ..add(DiagnosticsProperty<ui.Path>('selectedShadowPath', selectedShadowPath))
+      ..add(DiagnosticsProperty<Map<FlPortStyle, (ui.Path, ui.Paint)>>(
+          'batchSelectedPortByStyle', batchSelectedPortByStyle))
+      ..add(IterableProperty<RenderBox>('unselectedChildren', unselectedChildren))
+      ..add(DiagnosticsProperty<ui.Path>('unselectedShadowPath', unselectedShadowPath))
+      ..add(DiagnosticsProperty<Map<FlPortStyle, (ui.Path, ui.Paint)>>(
+          'batchUnselectedPortByStyle', batchUnselectedPortByStyle))
+      ..add(IterableProperty<(PortLocator, ui.Rect)>('portsHitTestData', portsHitTestData))
+      ..add(StringProperty('lastHoveredNodeId', lastHoveredNodeId))
+      ..add(StringProperty('lastHoveredLinkId', lastHoveredLinkId))
+      ..add(DiagnosticsProperty<PortLocator?>('lastHoveredPortLocator', lastHoveredPortLocator));
+    // dart format on
+  }
 }

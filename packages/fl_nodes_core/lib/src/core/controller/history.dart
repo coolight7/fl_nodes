@@ -1,8 +1,8 @@
-import '../../constants.dart';
-import '../containers/stack.dart';
-import '../events/events.dart';
-import '../models/data.dart';
-import 'core.dart';
+import 'package:fl_nodes_core/src/constants.dart';
+import 'package:fl_nodes_core/src/core/containers/stack.dart';
+import 'package:fl_nodes_core/src/core/events/events.dart';
+import 'package:fl_nodes_core/src/core/models/data.dart';
+import 'package:fl_nodes_core/src/core/controller/core.dart';
 
 /// A class that manages the undo and redo history of the node editor.
 ///
@@ -39,9 +39,7 @@ class FlNodesHistoryHelper {
   void _handleUndoableEvents(NodeEditorEvent event) {
     if (!event.isUndoable || _isTraversingHistory) return;
 
-    if (event is FlNodeFieldEvent ||
-        event is FlNodeCustomDataEvent ||
-        event is FlLinkLabelEvent) {
+    if (event is FlNodeFieldEvent || event is FlNodeCustomDataEvent || event is FlLinkLabelEvent) {
       // TODO: Implement undo/redo for these events later.
       return;
     }
@@ -49,8 +47,8 @@ class FlNodesHistoryHelper {
     if (_undoStack.length >= kMaxEventUndoHistory) _undoStack.evict();
     if (_redoStack.length >= kMaxEventRedoHistory) _redoStack.evict();
 
-    final previousEvent = _undoStack.peek();
-    final nextEvent = _redoStack.peek();
+    final NodeEditorEvent? previousEvent = _undoStack.peek();
+    final NodeEditorEvent? nextEvent = _redoStack.peek();
 
     if (event.id != previousEvent?.id && event.id != nextEvent?.id) {
       _redoStack.clear();
@@ -58,18 +56,18 @@ class FlNodesHistoryHelper {
       return;
     }
 
-    if (event is FlDragSelectionEvent &&
-        previousEvent is FlDragSelectionEvent) {
+    if (event is FlDragSelectionEvent && previousEvent is FlDragSelectionEvent) {
       if (event.nodeIds.length == previousEvent.nodeIds.length &&
           event.nodeIds.every(previousEvent.nodeIds.contains)) {
-        _undoStack.pop();
-        _undoStack.push(
-          FlDragSelectionEvent(
-            id: event.id,
-            event.nodeIds,
-            event.delta + previousEvent.delta,
-          ),
-        );
+        _undoStack
+          ..pop()
+          ..push(
+            FlDragSelectionEvent(
+              id: event.id,
+              event.nodeIds,
+              event.delta + previousEvent.delta,
+            ),
+          );
         return;
       }
     }
@@ -82,7 +80,7 @@ class FlNodesHistoryHelper {
     if (_undoStack.isEmpty) return;
 
     _isTraversingHistory = true;
-    final event = _undoStack.pop()!;
+    final NodeEditorEvent event = _undoStack.pop()!;
     _redoStack.push(event);
 
     try {
@@ -114,7 +112,7 @@ class FlNodesHistoryHelper {
     if (_redoStack.isEmpty) return;
 
     _isTraversingHistory = true;
-    final event = _redoStack.pop()!;
+    final NodeEditorEvent event = _redoStack.pop()!;
     _undoStack.push(event);
 
     try {

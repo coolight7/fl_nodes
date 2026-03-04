@@ -1,13 +1,13 @@
+import 'package:fl_nodes_core/src/core/controller/core.dart';
+import 'package:fl_nodes_core/src/core/models/data.dart';
+import 'package:fl_nodes_core/src/core/utils/rendering/renderbox.dart';
 import 'package:flutter/material.dart';
-
 import 'package:uuid/uuid.dart';
 
-import '../../controller/core.dart';
-import '../../models/data.dart';
-import '../rendering/renderbox.dart';
-
+// `abstract final class` is basically a namespace for static methods, and cannot be instantiated or extended.
+// ignore: avoid_classes_with_only_static_members
 /// Utility class for the node editor.
-class FlNodesUtils {
+abstract final class FlNodesUtils {
   /// Calculates the encompassing rectangle of the selected nodes.
   ///
   /// The encompassing rectangle is calculated by taking the top-left and bottom-right
@@ -19,9 +19,8 @@ class FlNodesUtils {
     Map<String, FlNodeDataModel> nodes, {
     double margin = 100.0,
   }) {
-    final rects = ids
-        .map((id) => RenderBoxUtils.getEntityBoundsInWorld(nodes[id]!))
-        .whereType<Rect>();
+    final Iterable<Rect> rects =
+        ids.map((id) => RenderBoxUtils.getEntityBoundsInWorld(nodes[id]!)).whereType<Rect>();
 
     return RenderBoxUtils.calculateBoundingRect(rects, margin: margin);
   }
@@ -31,16 +30,16 @@ class FlNodesUtils {
   /// This function is used when pasting nodes to generate new IDs for the
   /// pasted nodes, ports, and links. This is done to avoid conflicts with
   /// existing nodes and to allow for multiple pastes of the same selection.
-  static Future<Map<String, String>> mapToNewIds(
+  static Map<String, String> mapToNewIds(
     List<FlNodeDataModel> nodes,
-  ) async {
+  ) {
     final Map<String, String> newIds = {};
 
     for (final node in nodes) {
       newIds[node.id] = const Uuid().v4();
 
-      for (final port in node.ports.values) {
-        for (final link in port.links) {
+      for (final FlPortDataModel port in node.ports.values) {
+        for (final FlLinkDataModel link in port.links) {
           newIds[link.id] = const Uuid().v4();
         }
       }
@@ -57,11 +56,11 @@ class FlNodesUtils {
     final Set<String> linkIds = {};
 
     for (final nodeId in nodeIds) {
-      final node = nodes[nodeId];
+      final FlNodeDataModel? node = nodes[nodeId];
       if (node == null) continue;
 
-      for (final port in node.ports.values) {
-        for (final link in port.links) {
+      for (final FlPortDataModel port in node.ports.values) {
+        for (final FlLinkDataModel link in port.links) {
           linkIds.add(link.id);
         }
       }
@@ -79,17 +78,13 @@ class FlNodesUtils {
     List<FlLinkDataModel> links,
   ) {
     for (final link in links) {
-      final a = link.ports.$1;
-      final b = link.ports.$2;
+      final PortLocator a = link.ports.$1;
+      final PortLocator b = link.ports.$2;
 
-      final sameOrder = a.nodeId == node1Id &&
-          a.portId == port1Id &&
-          b.nodeId == node2Id &&
-          b.portId == port2Id;
-      final swappedOrder = a.nodeId == node2Id &&
-          a.portId == port2Id &&
-          b.nodeId == node1Id &&
-          b.portId == port1Id;
+      final bool sameOrder =
+          a.nodeId == node1Id && a.portId == port1Id && b.nodeId == node2Id && b.portId == port2Id;
+      final bool swappedOrder =
+          a.nodeId == node2Id && a.portId == port2Id && b.nodeId == node1Id && b.portId == port1Id;
 
       if (sameOrder || swappedOrder) return true;
     }
@@ -102,13 +97,12 @@ class FlNodesUtils {
     FlNodesController controller,
     FlLinkDataModel link,
   ) {
-    bool isOutputPort(FlPortDataModel port) {
-      return port.prototype is FlDataOutputPortPrototype ||
-          port.prototype is FlControlOutputPortPrototype;
-    }
+    bool isOutputPort(FlPortDataModel port) =>
+        port.prototype is FlDataOutputPortPrototype ||
+        port.prototype is FlControlOutputPortPrototype;
 
-    final node1 = controller.nodes[link.ports.$1.nodeId]!;
-    final port1 = node1.ports[link.ports.$1.portId]!;
+    final FlNodeDataModel node1 = controller.nodes[link.ports.$1.nodeId]!;
+    final FlPortDataModel port1 = node1.ports[link.ports.$1.portId]!;
 
     if (isOutputPort(port1)) {
       return (nodeId: link.ports.$1.nodeId, portId: link.ports.$1.portId);
@@ -122,13 +116,11 @@ class FlNodesUtils {
     FlNodesController controller,
     FlLinkDataModel link,
   ) {
-    bool isInputPort(FlPortDataModel port) {
-      return port.prototype is FlDataInputPortPrototype ||
-          port.prototype is FlControlInputPortPrototype;
-    }
+    bool isInputPort(FlPortDataModel port) =>
+        port.prototype is FlDataInputPortPrototype || port.prototype is FlControlInputPortPrototype;
 
-    final node1 = controller.nodes[link.ports.$1.nodeId]!;
-    final port1 = node1.ports[link.ports.$1.portId]!;
+    final FlNodeDataModel node1 = controller.nodes[link.ports.$1.nodeId]!;
+    final FlPortDataModel port1 = node1.ports[link.ports.$1.portId]!;
 
     if (isInputPort(port1)) {
       return (nodeId: link.ports.$1.nodeId, portId: link.ports.$1.portId);
@@ -144,10 +136,10 @@ class FlNodesUtils {
   ) {
     final connectedNodeIds = <String>{};
 
-    final ports = node.ports.values.where((port) => port.prototype is T);
+    final Iterable<FlPortDataModel> ports = node.ports.values.where((port) => port.prototype is T);
 
     for (final port in ports) {
-      for (final link in port.links) {
+      for (final FlLinkDataModel link in port.links) {
         if (T == FlControlInputPortPrototype || T == FlDataInputPortPrototype) {
           connectedNodeIds.add(
             FlNodesUtils.getSource(controller, link).nodeId,
@@ -170,7 +162,7 @@ class FlNodesUtils {
   ) {
     final connectedNodeIds = <String>{};
 
-    for (final link in port.links) {
+    for (final FlLinkDataModel link in port.links) {
       if (port.prototype is FlControlInputPortPrototype ||
           port.prototype is FlDataInputPortPrototype) {
         connectedNodeIds.add(

@@ -1,26 +1,26 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:fl_nodes/fl_nodes.dart';
 import 'package:fl_nodes_example/l10n/app_localizations.dart';
 import 'package:fl_nodes_example/models/locale.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPanel extends StatelessWidget {
   const SettingsPanel({
     super.key,
-    required this.locales,
     required this.currentLocale,
     required this.onLocaleChanged,
     required this.controller,
   });
 
-  final List<LocaleDataModel> locales;
   final Locale currentLocale;
-  final Function(String) onLocaleChanged;
+  final void Function(String) onLocaleChanged;
   final FlNodesController controller;
 
   @override
   Widget build(BuildContext context) {
-    final strings = AppLocalizations.of(context)!;
+    final AppLocalizations strings = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -99,21 +99,27 @@ class SettingsPanel extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: currentLocale.languageCode,
                       isExpanded: true,
-                      items: locales.map((locale) {
-                        return DropdownMenuItem<String>(
-                          value: locale.code,
-                          child: Row(
-                            children: [
-                              Text(
-                                locale.flag,
-                                style: const TextStyle(fontSize: 18),
+                      items: SupportedLocale.values
+                          .map(
+                            (locale) => DropdownMenuItem<String>(
+                              value: locale.languageCode,
+                              child: Row(
+                                children: [
+                                  CountryFlag.fromCountryCode(
+                                    locale.countryCode,
+                                    theme: const ImageTheme(
+                                      shape: RoundedRectangle(4),
+                                      height: 18,
+                                      width: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(locale.displayName),
+                                ],
                               ),
-                              const SizedBox(width: 12),
-                              Text(locale.name),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                            ),
+                          )
+                          .toList(),
                       onChanged: (String? value) {
                         if (value != null) {
                           onLocaleChanged(value);
@@ -152,15 +158,13 @@ class SettingsPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
+  Widget _buildSectionTitle(BuildContext context, String title) => Text(
+    title,
+    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+      color: Theme.of(context).colorScheme.primary,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 
   Widget _buildLinkTile(
     BuildContext context,
@@ -168,25 +172,32 @@ class SettingsPanel extends StatelessWidget {
     String subtitle,
     IconData icon,
     VoidCallback onTap,
-  ) {
-    return ListTile(
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: Icon(
-        Icons.open_in_new,
-        size: 18,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-      onTap: onTap,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    );
-  }
+  ) => ListTile(
+    leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+    title: Text(title),
+    subtitle: Text(subtitle),
+    trailing: Icon(
+      Icons.open_in_new,
+      size: 18,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    ),
+    onTap: onTap,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  );
 
   Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
+    final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<Locale>('currentLocale', currentLocale))
+      ..add(ObjectFlagProperty<void Function(String)>.has('onLocaleChanged', onLocaleChanged))
+      ..add(DiagnosticsProperty<FlNodesController>('controller', controller));
   }
 }

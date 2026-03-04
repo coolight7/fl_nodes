@@ -1,7 +1,9 @@
 import 'package:fl_nodes/fl_nodes.dart';
 import 'package:flutter/material.dart';
 
-class NodeHeaderStyles {
+// `abstract final class` is basically a namespace for static methods, and cannot be instantiated or extended.
+// ignore: avoid_classes_with_only_static_members
+abstract final class NodeHeaderStyles {
   static FlNodeHeaderStyle value(FlNodeState state) =>
       flDefaultNodeHeaderStyleBuilder(state).copyWith(
         decoration: const BoxDecoration(
@@ -77,18 +79,17 @@ class NodeHeaderStyles {
         ),
       );
 
-  static FlNodeHeaderStyle io(FlNodeState state) =>
-      flDefaultNodeHeaderStyleBuilder(state).copyWith(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.purple, Colors.transparent],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-          ),
-        ),
-      );
+  static FlNodeHeaderStyle io(FlNodeState state) => flDefaultNodeHeaderStyleBuilder(state).copyWith(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Colors.purple, Colors.transparent],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+    ),
+  );
 }

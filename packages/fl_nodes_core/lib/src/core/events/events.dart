@@ -1,9 +1,9 @@
 import 'package:fl_nodes_core/src/core/controller/runner.dart';
 import 'package:flutter/material.dart';
 
-import '../../styles/styles.dart';
-import '../controller/core.dart';
-import '../models/data.dart';
+import 'package:fl_nodes_core/src/styles/styles.dart';
+import 'package:fl_nodes_core/src/core/controller/core.dart';
+import 'package:fl_nodes_core/src/core/models/data.dart';
 
 /// Base event: small immutable payload common to all events.
 @immutable
@@ -80,13 +80,11 @@ abstract base class FlProjectClassEvent extends NodeEditorEvent {
 }
 
 abstract base class FlTempInteractionClassEvent extends NodeEditorEvent {
-  const FlTempInteractionClassEvent({required super.id, super.isHandled})
-      : super();
+  const FlTempInteractionClassEvent({required super.id, super.isHandled}) : super();
 }
 
 abstract base class FlConfigurationClassEvent extends NodeEditorEvent {
-  const FlConfigurationClassEvent({required super.id, super.isHandled})
-      : super();
+  const FlConfigurationClassEvent({required super.id, super.isHandled}) : super();
 }
 
 /// ---------------------------------------------------------------------------
@@ -100,30 +98,28 @@ abstract base class FlConfigurationClassEvent extends NodeEditorEvent {
 
 /// Event produced when the viewport offset changes.
 /// -> Paint (no layout)
-final class FlViewportOffsetEvent extends FlViewportClassEvent
-    with FlPaintEventCat {
+final class FlViewportOffsetEvent extends FlViewportClassEvent with FlPaintEventCat {
   final Offset offset;
   final bool animate;
 
   const FlViewportOffsetEvent(
     this.offset, {
-    this.animate = true,
     required super.id,
+    this.animate = true,
     super.isHandled = false,
   });
 }
 
 /// Event produced when the viewport zoom level changes.
 /// -> Paint (no layout)
-final class FlViewportZoomEvent extends FlViewportClassEvent
-    with FlPaintEventCat {
+final class FlViewportZoomEvent extends FlViewportClassEvent with FlPaintEventCat {
   final double zoom;
   final bool animate;
 
   const FlViewportZoomEvent(
     this.zoom, {
-    this.animate = true,
     required super.id,
+    this.animate = true,
     super.isHandled = false,
   });
 }
@@ -134,8 +130,7 @@ final class FlViewportZoomEvent extends FlViewportClassEvent
 
 enum FlSelectionEventType { select, holdSelect, deselect }
 
-final class FlNodeSelectionEvent extends FlSelectionClassEvent
-    with FlLayoutEventCat {
+final class FlNodeSelectionEvent extends FlSelectionClassEvent with FlLayoutEventCat {
   final FlSelectionEventType type;
   final Set<String> nodeIds;
 
@@ -148,8 +143,7 @@ final class FlNodeSelectionEvent extends FlSelectionClassEvent
   });
 }
 
-final class FlLinkSelectionEvent extends FlSelectionClassEvent
-    with FlPaintEventCat {
+final class FlLinkSelectionEvent extends FlSelectionClassEvent with FlPaintEventCat {
   final FlSelectionEventType type;
   final Set<String> linkIds;
 
@@ -163,8 +157,7 @@ final class FlLinkSelectionEvent extends FlSelectionClassEvent
 }
 
 /// Dragging selection updates positions -> layout (and undoable)
-final class FlDragSelectionStartEvent extends FlGraphEditClassEvent
-    with FlLayoutEventCat {
+final class FlDragSelectionStartEvent extends FlGraphEditClassEvent with FlLayoutEventCat {
   final Set<String> nodeIds;
   final Offset position;
 
@@ -176,24 +169,24 @@ final class FlDragSelectionStartEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'nodeIds': nodeIds.toList(),
         'position': [position.dx, position.dy],
       };
 
   factory FlDragSelectionStartEvent.fromJson(Map<String, dynamic> json) {
+    final position = json['position'] as List<dynamic>;
     return FlDragSelectionStartEvent(
       (json['nodeIds'] as List).cast<String>().toSet(),
-      Offset(json['position'][0], json['position'][1]),
+      Offset((position[0] as num).toDouble(), (position[1] as num).toDouble()),
       id: json['id'] as String,
       isHandled: json['isHandled'] as bool,
     );
   }
 }
 
-final class FlDragSelectionEvent extends FlGraphEditClassEvent
-    with FlLayoutEventCat {
+final class FlDragSelectionEvent extends FlGraphEditClassEvent with FlLayoutEventCat {
   final Set<String> nodeIds;
   final Offset delta;
 
@@ -205,24 +198,24 @@ final class FlDragSelectionEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'nodeIds': nodeIds.toList(),
         'delta': [delta.dx, delta.dy],
       };
 
   factory FlDragSelectionEvent.fromJson(Map<String, dynamic> json) {
+    final delta = json['delta'] as List<dynamic>;
     return FlDragSelectionEvent(
       (json['nodeIds'] as List).cast<String>().toSet(),
-      Offset(json['delta'][0], json['delta'][1]),
+      Offset((delta[0] as num).toDouble(), (delta[1] as num).toDouble()),
       id: json['id'] as String,
       isHandled: json['isHandled'] as bool,
     );
   }
 }
 
-final class FlDragSelectionEndEvent extends FlGraphEditClassEvent
-    with FlLayoutEventCat {
+final class FlDragSelectionEndEvent extends FlGraphEditClassEvent with FlLayoutEventCat {
   final Offset position;
   final Set<String> nodeIds;
 
@@ -234,15 +227,16 @@ final class FlDragSelectionEndEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'position': [position.dx, position.dy],
         'nodeIds': nodeIds.toList(),
       };
 
   factory FlDragSelectionEndEvent.fromJson(Map<String, dynamic> json) {
+    final position = json['position'] as List<dynamic>;
     return FlDragSelectionEndEvent(
-      Offset(json['position'][0], json['position'][1]),
+      Offset((position[0] as num).toDouble(), (position[1] as num).toDouble()),
       (json['nodeIds'] as List).cast<String>().toSet(),
       id: json['id'] as String,
       isHandled: json['isHandled'] as bool,
@@ -295,8 +289,7 @@ final class FlCutSelectionEvent extends FlClipboardClassEvent
 
 enum FlHoverEventType { enter, exit }
 
-final class FlNodeHoverEvent extends FlVisualizationClassEvent
-    with FlLayoutEventCat {
+final class FlNodeHoverEvent extends FlVisualizationClassEvent with FlLayoutEventCat {
   final FlHoverEventType type;
   final String nodeId;
 
@@ -312,8 +305,7 @@ final class FlNodeHoverEvent extends FlVisualizationClassEvent
 // Graph edit events (mutate graph — default to LayoutEvent; adjust if only paint)
 ////////////////////////////////////////////////////////////////////////
 
-final class FlAddNodeEvent extends FlGraphEditClassEvent
-    with FlTreeEventCat, FlLayoutEventCat {
+final class FlAddNodeEvent extends FlGraphEditClassEvent with FlTreeEventCat, FlLayoutEventCat {
   final FlNodeDataModel node;
 
   const FlAddNodeEvent(
@@ -323,7 +315,7 @@ final class FlAddNodeEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'node': node.toJson(dataHandlers),
       };
@@ -331,21 +323,19 @@ final class FlAddNodeEvent extends FlGraphEditClassEvent
   factory FlAddNodeEvent.fromJson(
     Map<String, dynamic> json, {
     required FlNodesController controller,
-  }) {
-    return FlAddNodeEvent(
-      FlNodeDataModel.fromJson(
-        json['node'] as Map<String, dynamic>,
-        nodePrototypes: controller.nodePrototypes,
-        dataHandlers: controller.project.dataHandlers,
-      ),
-      id: json['id'] as String,
-      isHandled: json['isHandled'] as bool,
-    );
-  }
+  }) =>
+      FlAddNodeEvent(
+        FlNodeDataModel.fromJson(
+          json['node'] as Map<String, dynamic>,
+          nodePrototypes: controller.nodePrototypes,
+          dataHandlers: controller.project.dataHandlers,
+        ),
+        id: json['id'] as String,
+        isHandled: json['isHandled'] as bool,
+      );
 }
 
-final class FlRemoveNodeEvent extends FlGraphEditClassEvent
-    with FlTreeEventCat, FlLayoutEventCat {
+final class FlRemoveNodeEvent extends FlGraphEditClassEvent with FlTreeEventCat, FlLayoutEventCat {
   final FlNodeDataModel node;
 
   const FlRemoveNodeEvent(
@@ -355,7 +345,7 @@ final class FlRemoveNodeEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'node': node.toJson(dataHandlers),
       };
@@ -363,17 +353,16 @@ final class FlRemoveNodeEvent extends FlGraphEditClassEvent
   factory FlRemoveNodeEvent.fromJson(
     Map<String, dynamic> json, {
     required FlNodesController controller,
-  }) {
-    return FlRemoveNodeEvent(
-      FlNodeDataModel.fromJson(
-        json['node'] as Map<String, dynamic>,
-        nodePrototypes: controller.nodePrototypes,
-        dataHandlers: controller.project.dataHandlers,
-      ),
-      id: json['id'] as String,
-      isHandled: json['isHandled'] as bool,
-    );
-  }
+  }) =>
+      FlRemoveNodeEvent(
+        FlNodeDataModel.fromJson(
+          json['node'] as Map<String, dynamic>,
+          nodePrototypes: controller.nodePrototypes,
+          dataHandlers: controller.project.dataHandlers,
+        ),
+        id: json['id'] as String,
+        isHandled: json['isHandled'] as bool,
+      );
 }
 
 final class FlAddLinkEvent extends FlGraphEditClassEvent with FlPaintEventCat {
@@ -386,7 +375,7 @@ final class FlAddLinkEvent extends FlGraphEditClassEvent with FlPaintEventCat {
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'link': link.toJson(),
       };
@@ -394,22 +383,18 @@ final class FlAddLinkEvent extends FlGraphEditClassEvent with FlPaintEventCat {
   factory FlAddLinkEvent.fromJson(
     Map<String, dynamic> json,
     Map<Type, DataHandler> dataHandlers,
-    FlLinkPrototype prototype,
-  ) {
-    return FlAddLinkEvent(
-      FlLinkDataModel.fromJson(
-        json['link'] as Map<String, dynamic>,
-        dataHandlers,
-        prototype,
-      ),
-      id: json['id'] as String,
-      isHandled: json['isHandled'] as bool,
-    );
-  }
+  ) =>
+      FlAddLinkEvent(
+        FlLinkDataModel.fromJson(
+          json['link'] as Map<String, dynamic>,
+          dataHandlers,
+        ),
+        id: json['id'] as String,
+        isHandled: json['isHandled'] as bool,
+      );
 }
 
-final class FlRemoveLinkEvent extends FlGraphEditClassEvent
-    with FlPaintEventCat {
+final class FlRemoveLinkEvent extends FlGraphEditClassEvent with FlPaintEventCat {
   final FlLinkDataModel link;
 
   const FlRemoveLinkEvent(
@@ -419,7 +404,7 @@ final class FlRemoveLinkEvent extends FlGraphEditClassEvent
   });
 
   @override
-  Map<String, dynamic> toJson(dataHandlers) => {
+  Map<String, dynamic> toJson(Map<Type, DataHandler> dataHandlers) => {
         ...super.toJson(dataHandlers),
         'link': link.toJson(),
       };
@@ -427,18 +412,15 @@ final class FlRemoveLinkEvent extends FlGraphEditClassEvent
   factory FlRemoveLinkEvent.fromJson(
     Map<String, dynamic> json,
     Map<Type, DataHandler> dataHandlers,
-    FlLinkPrototype prototype,
-  ) {
-    return FlRemoveLinkEvent(
-      FlLinkDataModel.fromJson(
-        json['link'] as Map<String, dynamic>,
-        dataHandlers,
-        prototype,
-      ),
-      id: json['id'] as String,
-      isHandled: json['isHandled'] as bool,
-    );
-  }
+  ) =>
+      FlRemoveLinkEvent(
+        FlLinkDataModel.fromJson(
+          json['link'] as Map<String, dynamic>,
+          dataHandlers,
+        ),
+        id: json['id'] as String,
+        isHandled: json['isHandled'] as bool,
+      );
 }
 
 enum FlFieldEventType {
@@ -447,8 +429,7 @@ enum FlFieldEventType {
   cancel,
 }
 
-final class FlNodeFieldEvent extends FlGraphEditClassEvent
-    with FlLayoutEventCat {
+final class FlNodeFieldEvent extends FlGraphEditClassEvent with FlLayoutEventCat {
   final String nodeId;
   final dynamic value;
   final FlFieldEventType eventType;
@@ -462,8 +443,7 @@ final class FlNodeFieldEvent extends FlGraphEditClassEvent
   });
 }
 
-final class FlLinkLabelEvent extends FlGraphEditClassEvent
-    with FlPaintEventCat {
+final class FlLinkLabelEvent extends FlGraphEditClassEvent with FlPaintEventCat {
   final String linkId;
   final String label;
 
@@ -489,8 +469,7 @@ final class FlNodeCustomDataEvent extends FlGraphEditClassEvent {
   });
 }
 
-final class FlNodeCustomDataPaintEvent extends FlGraphEditClassEvent
-    with FlPaintEventCat {
+final class FlNodeCustomDataPaintEvent extends FlGraphEditClassEvent with FlPaintEventCat {
   final String nodeId;
   final String key;
   final dynamic value;
@@ -504,8 +483,7 @@ final class FlNodeCustomDataPaintEvent extends FlGraphEditClassEvent
   });
 }
 
-final class FlNodeCustomDataLayoutEvent extends FlGraphEditClassEvent
-    with FlLayoutEventCat {
+final class FlNodeCustomDataLayoutEvent extends FlGraphEditClassEvent with FlLayoutEventCat {
   final String nodeId;
   final String key;
   final dynamic value;
@@ -523,8 +501,7 @@ final class FlNodeCustomDataLayoutEvent extends FlGraphEditClassEvent
 // Visualization tweaks
 ////////////////////////////////////////////////////////////////////////
 
-final class FlCollapseNodeEvent extends FlVisualizationClassEvent
-    with FlLayoutEventCat {
+final class FlCollapseNodeEvent extends FlVisualizationClassEvent with FlLayoutEventCat {
   final bool collpased;
   final Set<String> nodeIds;
 
@@ -595,13 +572,11 @@ final class FlSaveProjectEvent extends FlProjectClassEvent {
   const FlSaveProjectEvent({required super.id});
 }
 
-final class FlLoadProjectEvent extends FlProjectClassEvent
-    with FlTreeEventCat, FlLayoutEventCat {
+final class FlLoadProjectEvent extends FlProjectClassEvent with FlTreeEventCat, FlLayoutEventCat {
   const FlLoadProjectEvent({required super.id});
 }
 
-final class FlNewProjectEvent extends FlProjectClassEvent
-    with FlTreeEventCat, FlLayoutEventCat {
+final class FlNewProjectEvent extends FlProjectClassEvent with FlTreeEventCat, FlLayoutEventCat {
   const FlNewProjectEvent({required super.id});
 }
 
@@ -612,22 +587,19 @@ final class FlConfigurationChangeEvent extends FlConfigurationClassEvent
   const FlConfigurationChangeEvent(this.config, {required super.id});
 }
 
-final class FlStyleChangeEvent extends FlConfigurationClassEvent
-    with FlLayoutEventCat {
+final class FlStyleChangeEvent extends FlConfigurationClassEvent with FlLayoutEventCat {
   final FlNodesStyle style;
 
   const FlStyleChangeEvent(this.style, {required super.id});
 }
 
-final class FlLocaleChangeEvent extends FlConfigurationClassEvent
-    with FlLayoutEventCat {
+final class FlLocaleChangeEvent extends FlConfigurationClassEvent with FlLayoutEventCat {
   final Locale locale;
 
   const FlLocaleChangeEvent(this.locale, {required super.id});
 }
 
-final class FlOverlayChangedEvent extends FlConfigurationClassEvent
-    with FlPaintEventCat {
+final class FlOverlayChangedEvent extends FlConfigurationClassEvent with FlPaintEventCat {
   final Set<String> idNames;
 
   const FlOverlayChangedEvent(this.idNames, {required super.id});
@@ -637,8 +609,7 @@ final class FlOverlayChangedEvent extends FlConfigurationClassEvent
 // Temporary drawing / interaction events (paint-only or no-render)
 ////////////////////////////////////////////////////////////////////////
 
-final class FlDrawTempLinkEvent extends FlTempInteractionClassEvent
-    with FlPaintEventCat {
+final class FlDrawTempLinkEvent extends FlTempInteractionClassEvent with FlPaintEventCat {
   final Offset startOffset;
   final Offset endOffset;
 
@@ -650,8 +621,7 @@ final class FlDrawTempLinkEvent extends FlTempInteractionClassEvent
   });
 }
 
-final class FlAreaHighlightEvent extends FlTempInteractionClassEvent
-    with FlPaintEventCat {
+final class FlAreaHighlightEvent extends FlTempInteractionClassEvent with FlPaintEventCat {
   final Rect? area;
 
   const FlAreaHighlightEvent(

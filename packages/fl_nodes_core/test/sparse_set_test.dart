@@ -26,8 +26,9 @@ void main() {
     });
 
     test('RemoveKey', () {
-      set.insert(3, 300);
-      set.insert(5, 500);
+      set
+        ..insert(3, 300)
+        ..insert(5, 500);
 
       expect(set.contains(3), isTrue);
       expect(set.contains(5), isTrue);
@@ -43,8 +44,9 @@ void main() {
     });
 
     test('ClearEmptiesSet', () {
-      set.insert(7, 700);
-      set.insert(8, 800);
+      set
+        ..insert(7, 700)
+        ..insert(8, 800);
 
       expect(set.size, equals(2));
 
@@ -71,11 +73,12 @@ void main() {
     });
 
     test('DenseIterationOrder', () {
-      set.insert(10, 1000);
-      set.insert(20, 2000);
-      set.insert(15, 1500);
-      final keys = set.keys.toList();
-      final values = set.values.toList();
+      set
+        ..insert(10, 1000)
+        ..insert(20, 2000)
+        ..insert(15, 1500);
+      final List<int> keys = set.keys.toList();
+      final List<int> values = set.values.toList();
       expect(keys.length, equals(3));
       expect(values.length, equals(3));
       expect(keys[0], equals(10));
@@ -95,7 +98,7 @@ void main() {
         keys.shuffle(rng);
 
         // insert all
-        for (var k in keys) {
+        for (final k in keys) {
           set.insert(k, k);
         }
         expect(set.size, equals(keyCount));
@@ -108,7 +111,7 @@ void main() {
         expect(set.size, equals(keyCount ~/ 2));
 
         // remove rest
-        for (var i = keyCount ~/ 2; i < keyCount; ++i) {
+        for (int i = keyCount ~/ 2; i < keyCount; ++i) {
           set.remove(keys[i]);
         }
 
@@ -119,19 +122,17 @@ void main() {
     test('PageBoundaryReinsert', () {
       final edgeKeys = [63, 64, 65, 127];
 
-      for (var k in edgeKeys) {
+      for (final k in edgeKeys) {
         set.insert(k, k);
       }
 
       expect(set.size, equals(edgeKeys.length));
 
-      for (var k in edgeKeys) {
-        set.remove(k);
-      }
+      edgeKeys.forEach(set.remove);
 
       expect(set.size, equals(0));
 
-      for (var k in edgeKeys) {
+      for (final k in edgeKeys) {
         set.insert(k, k + 10);
         expect(set.contains(k), isTrue);
         expect(set.get(k), equals(k + 10));

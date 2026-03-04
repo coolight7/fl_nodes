@@ -1,4 +1,5 @@
 import 'package:fl_context_menu/fl_context_menu.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class FlMenuItemTile extends StatefulWidget {
@@ -6,7 +7,7 @@ class FlMenuItemTile extends StatefulWidget {
   final String? label;
   final IconData? iconData;
   final VoidCallback? onTap;
-  final Function(String)? onPressed;
+  final void Function(String)? onPressed;
   final bool closeOnTap;
   final FlMenuItemStyle style;
   final bool isEnabled;
@@ -14,17 +15,31 @@ class FlMenuItemTile extends StatefulWidget {
   const FlMenuItemTile({
     super.key,
     required this.id,
+    required this.style,
     this.isEnabled = true,
     this.label,
     this.iconData,
     this.onPressed,
     this.onTap,
     this.closeOnTap = true,
-    required this.style,
   });
 
   @override
   State<FlMenuItemTile> createState() => _FlMenuItemTileState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(StringProperty('id', id))
+      ..add(StringProperty('label', label))
+      ..add(DiagnosticsProperty<IconData?>('iconData', iconData))
+      ..add(ObjectFlagProperty<VoidCallback?>.has('onTap', onTap))
+      ..add(ObjectFlagProperty<void Function(String)?>.has('onPressed', onPressed))
+      ..add(DiagnosticsProperty<bool>('closeOnTap', closeOnTap))
+      ..add(DiagnosticsProperty<FlMenuItemStyle>('style', style))
+      ..add(DiagnosticsProperty<bool>('isEnabled', isEnabled));
+  }
 }
 
 class _FlMenuItemTileState extends State<FlMenuItemTile> {
@@ -62,7 +77,7 @@ class _FlMenuItemTileState extends State<FlMenuItemTile> {
             children: [
               if (widget.iconData != null) ...[
                 Icon(
-                  widget.iconData!,
+                  widget.iconData,
                   size: 16,
                   color: Colors.white70,
                 ),

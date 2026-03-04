@@ -4,15 +4,14 @@ import 'package:flutter/foundation.dart';
 mixin SingleListenerChangeNotifier implements Listenable {
   VoidCallback? listener;
 
-  void notifyListeners() =>
-      listener?.call(); // just to be compatible with [ChangeNotifier]
+  void notifyListeners() => listener?.call(); // just to be compatible with [ChangeNotifier]
 
   @override
   @visibleForOverriding
   void addListener(VoidCallback listener) {
     if (this.listener != null) {
       throw StateError(
-        "Trying to add another listener, but this Listenable only supports one listener at a time",
+        'Trying to add another listener, but this Listenable only supports one listener at a time',
       );
     }
 
