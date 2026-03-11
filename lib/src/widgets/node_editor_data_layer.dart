@@ -972,7 +972,7 @@ class _NodeEditorDataLayerState extends State<NodeEditorDataLayer>
     return controlsWrapper(
       RepaintBoundary(
         child: ShaderBuilder(
-          assetKey: 'packages/fl_nodes/shaders/grid.frag',
+          assetKey: 'package_extend/fl_nodes/lib/shaders/grid.frag',
           (context, gridShader, child) => NodeEditorRenderObjectWidget(
             key: kNodeEditorWidgetKey,
             controller: widget.controller,
