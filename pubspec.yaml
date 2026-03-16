@@ -25,7 +25,7 @@ funding:
   - https://studio.buymeacoffee.com/dashboard
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -38,7 +38,47 @@ dependencies:
   uuid: ^4.5.1
 
 dev_dependencies:
+  melos: ^7.1.1
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ">=4.0.0 <6.0.0"
-  test_coverage_badge: ^0.3.2
+
+workspace:
+  - examples/fl_nodes_example
+  - examples/fl_context_menu_example
+  - benchmarks
+  - packages/fl_nodes
+  - packages/fl_nodes_core
+  - packages/fl_context_menu
+  - packages/fl_nodes_visual_scripting
+  - packages/fl_nodes_mind_maps
+
+melos:
+  publish:
+    git:
+      enabled: true
+
+  command:
+    bootstrap:
+      runPubGetInParallel: true
+      usePubspecOverrides: true
+    version:
+      linkToVersion: true
+      updateDependents: true
+      updateGitTagRefs: true
+
+  scripts:
+    format:
+      run: melos exec -- "dart format ."
+      description: Run dart format across all packages.
+
+    analyze:
+      run: melos exec -- "dart analyze --fatal-infos"
+      description: Run dart analyze across all packages.
+
+    example: cd examples/fl_nodes_example && flutter run -d chrome
+    example:profile: cd examples/fl_nodes_example && flutter run --profile -d chrome
+    example:release: cd examples/fl_nodes_example && flutter run --release -d chrome
+
+flutter:
+  uses-material-design: true

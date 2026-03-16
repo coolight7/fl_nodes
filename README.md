@@ -1,114 +1,91 @@
-# **FlNodes**
+# **🏗️ FlNodes Framework**
 
-🚀 **We're Participating in the OnlyDust Open Source Hackathon!**
+![Dart](https://img.shields.io/badge/Dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=flutter&logoColor=white)
+![Maintained](https://img.shields.io/badge/maintained%3F-yes-green?style=for-the-badge)
+![Melos](https://img.shields.io/badge/monorepo-managed%20with%20Melos-magenta?style=for-the-badge)
 
-The `fl_nodes` project is taking part in the **[OnlyDust](https://onlydust.com) Open Source Hackathon starting** May 28th, 2025!
+[![Pub](https://img.shields.io/pub/v/fl_nodes.svg?style=for-the-badge)](https://pub.dev/packages/fl_nodes)
+![Downloads](https://img.shields.io/pub/dm/fl_nodes.svg?style=for-the-badge)
+![Likes](https://img.shields.io/pub/likes/fl_nodes?style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/WilliamKarolDiCioccio/fl_nodes?style=for-the-badge)
+![Repo Size](https://img.shields.io/github/repo-size/WilliamKarolDiCioccio/fl_nodes?style=for-the-badge)
 
-If you're interested in Flutter, visual programming, or node-based interfaces, this is a great chance to contribute, learn, and collaborate. We’ll soon tag beginner-friendly issues and update documentation. We are ready to support contributors of all experience levels.
+> What do you think of badges? **YES!**
 
-👉 Check out the [Issues](https://github.com/WilliamKarolDiCioccio/fl_nodes/issues) to get started.
+The **FlNodes Framework** is a modular, scalable ecosystem for building sophisticated node-based applications in Flutter. Designed for developers who need professional-grade visual editors, workflow tools, and graph-based interfaces, FlNodes provides a complete solution from low-level rendering to high-level abstractions.
 
 ---
 
-![Coverage](https://github.com/WilliamKarolDiCioccio/fl_nodes/blob/main/coverage_badge.svg?sanitize=true)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/WilliamKarolDiCioccio/fl_nodes/refs/heads/main/.github/images/node_editor_example.webp" alt="FlNodes Example" />
+</p>
 
-## 🚀 **A Fully Customizable Node-Based Editor for Flutter**
+<p align="center">
+  <i >A screenshot from our visual scripting example app</i>
+</p>
 
-**FlNodes** is a lightweight, scalable, and highly customizable Flutter package for building interactive, node-based user interfaces.
+---
 
 ### 💡 Use Cases
 
 Whether you're building tools for developers, designers, or end-users, **FlNodes** provides the building blocks for:
 
 - 🎮 **Visual Scripting Editors** – Game logic, automation flows, or state machines.
-
 - 🛠 **Workflow & Process Designers** – Business rules, decision trees, and automation paths.
-
 - 🎨 **Shader & Material Graphs** – Build custom shaders visually.
-
 - 📊 **Dataflow Tools** – ETL pipelines, AI workflows, and processing graphs.
-
 - 🤖 **ML Architecture Visualizers** – Visualize and configure neural networks.
-
 - 🔊 **Modular Audio Systems** – Synthesizers, effect chains, or sequencing tools.
-
 - 🧠 **Graph-Based UIs** – Mind maps, dependency trees, and hierarchical structures.
 
 ---
 
-## 🌟 Features
+## 🏗️ Framework Architecture
 
-- ✅ **Customizable UI** – Fully override widgets, ports, fields, and layout logic.
+The FlNodes Framework is organized as a monorepo with specialized packages:
 
-- 💾 **Pluggable Storage** – Save/load via JSON with full control over serialization.
+### 📦 Core Packages
 
-- ⚡ **Optimized Performance** – Hardware-accelerated, efficient hit testing and rebuild minimization.
+- [**`fl_nodes_core`**](https://github.com/WilliamKarolDiCioccio/fl_nodes/tree/main/packages/fl_nodes_core) – The engine that powers the FlNodes Framework.
 
-- 🔗 **Flexible Graph System** – Directional edges, nested data, typed ports, and more.
+- [**`fl_nodes`**](https://github.com/WilliamKarolDiCioccio/fl_nodes/tree/main/packages/fl_nodes) – A proxy export package that maintains backward compatibility with earlier versions of the FlNodes framework.
 
-- 📏 **Scalable Architecture** – Suitable for both lightweight diagrams and complex editors.
+### 🔌 Coming Soon
 
-- 🎨 **Lightweight & Elegant** – Minimal dependencies, beautiful out of the box, and easy to style.
-
----
-
-## 🛠 Roadmap
-
-We're iterating fast, thanks to community adoption, forks, and feedback. Here's what’s next:
-
-### 🐛 Bug Fixes & Community Feedback
-
-- Addressing common issues raised in GitHub discussions and forks.
-
-- Fixes for node field state persistence and ID mismatches.
-
-- Improvements to hit testing and z-ordering in dense graphs.
-
-### ⚙️ Performance Enhancements
-
-- **Surgical Rebuilds** – Rebuild only the nodes affected by data or structural changes.
-
-- **Static Branch Precomputation** – Improve runtime by detecting and collapsing static branches in execution graphs.
-
-### 📚 Documentation Improvements
-
-- Expanded API docs and usage examples.
-
-- Guides for building non-scripting tools like mind maps, audio tools, or ML visualizers.
-
-### 🎛 General-Purpose Flexibility
-
-- 🤖 **Node Configuration State Machine** – Dynamically add or remove ports and fields on nodes at runtime, allowing node structure to adapt automatically based on current links and input data.
-
-- 🧑‍🤝‍🧑 **Node Grouping** – Enable users to select multiple nodes and group them together for easier organization, movement, and management within complex graphs.
-
-- ♻️ **Reusable Graph Macros** – Allow users to define, save, and reuse templates or functions made up of multiple nodes, streamlining the creation of common patterns and workflows.
-
-- 🎩 **Enhanced Editor Mode** – Introduce advanced, opt-in editing tools and keyboard shortcuts to improve productivity and provide a more powerful graph editing experience.
+- **`fl_nodes_visual_scripting`**
+- **`fl_nodes_mind_maps`**
+- **`fl_nodes_flow_graphs`**
 
 ---
 
-## 📸 **Screenshots**
+## 📚 **Getting Started**
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/WilliamKarolDiCioccio/fl_nodes/refs/heads/main/.github/images/node_editor_example.webp" alt="FlNodes Example" />
-</p>
+For a fast and easy setup, check out our [Quickstart Guide](https://github.com/WilliamKarolDiCioccio/fl_nodes/wiki/Quickstart). It covers the basics to get you up and running with **FlNodes** in no time!
 
----
-
-## 📚 **Quickstart Guide**
-
-For a fast and easy setup, check out our [Quickstart Guide](https://github.com/WilliamKarolDiCioccio/fl_nodes/blob/main/QUICKSTART.md). It covers the basics to get you up and running with **FlNodes** in no time!
+If you're migrating from an earlier version, the `fl_nodes` package maintains backward compatibility while providing access to the new modular architecture.
 
 ---
 
 ## 📦 **Installation**
 
-To add **FlNodes** to your Flutter project, include it in your `pubspec.yaml`:
+Choose the package that fits your needs:
 
 ```yaml
 dependencies:
-fl_nodes: ^latest_version
+  # For most users - high-level API with full features
+  fl_nodes: ^latest_version
+
+  # For advanced users needing low-level control
+  fl_nodes_core: ^latest_version
+```
+
+Regardless of the package you choose you must add the following asset:
+
+```yaml
+flutter:
+  shaders:
+    - packages/fl_nodes_core/shaders/grid.frag
 ```
 
 Then, run:
@@ -116,18 +93,6 @@ Then, run:
 ```bash
 flutter pub get
 ```
-
----
-
-## 🛠️ **Usage**
-
-Import the package in your Dart file:
-
-```dart
-import 'package:fl_nodes/fl_nodes.dart';
-```
-
-For full implementation details, check out the examples below.
 
 ---
 
@@ -152,14 +117,25 @@ Explore fully working examples:
 | 🖥️Desktop and 💻 laptop: | Windows | Linux | macOS |
 | ------------------------ | ------- | ----- | ----- |
 | **native/mouse**         | ✅      | ✅    | ✅    |
-| **native/trackpad**      | ✅      | ⚠️    | ✅    |
+| **native/trackpad**      | ✅      | 🧪    | ✅    |
 | **web/mouse**            | ✅      | ✅    | ✅    |
-| **web/trackpad**         | ❌      | ❌    | ❌    |
+| **web/trackpad**         | ✅      | ✅    | 🧪    |
 
 | 📱Mobile   | Android | iOS |
 | ---------- | ------- | --- |
-| **native** | ✅      | ❌  |
-| **web**    | ❌      | 🧪  |
+| **native** | ✅      | 🧪  |
+| **web**    | ✅      | 🧪  |
+
+---
+
+## 🙌 **Contributing**
+
+We'd love your help in making **FlNodes** even better! You can contribute by:
+
+- 💡 [Suggesting new features](https://github.com/WilliamKarolDiCioccio/fl_nodes/issues)
+- 🐛 [Reporting bugs](https://github.com/WilliamKarolDiCioccio/fl_nodes/issues)
+- 🔧 [Submitting pull requests](https://github.com/WilliamKarolDiCioccio/fl_nodes/pulls)
+- 👏 [**Sharing what you've built**](https://github.com/WilliamKarolDiCioccio/fl_nodes/discussions/49)
 
 ---
 
@@ -170,22 +146,12 @@ Contributions are welcome!
 
 ---
 
-## 🙌 **Contributing**
+## 🚀 **Let's Build Together!**
 
-We’d love your help in making **FlNodes** even better! You can contribute by:
+Enjoy using FlNodes and **create amazing node-based UIs** for your Flutter apps and/or **get involved in library's development**! 🌟
 
-- 💡 Suggesting new features
+<a href="https://github.com/WilliamKarolDiCioccio/fl_nodes/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=WilliamKarolDiCioccio/fl_nodes" />
+</a>
 
-- 🐛 Reporting bugs
-
-- 🔧 Submitting pull requests
-
-- 👏 [**Sharing what you've built**](https://github.com/WilliamKarolDiCioccio/fl_nodes/discussions/49)
-
-Feel free to file an issue or contribute directly on [GitHub](https://github.com/WilliamKarolDiCioccio/fl_nodes).
-
----
-
-## 🚀 **Let’s Build Together!**
-
-Enjoy using **FlNodes** and create amazing node-based UIs for your Flutter apps! 🌟
+Made with [contrib.rocks](https://contrib.rocks).
